@@ -91,7 +91,7 @@ function bindEtsPopup($elem) {
                 html = "";
                 if(ets_parents != '') html += "<span>" + ets_parents + "</span><br>";
                 html += "<span class='lead'><strong>";
-                if(ets_type != null) html+= "<img src='/images/types/b/icone-type-" + ets_type + ".png'>&nbsp;";
+                if(ets_type != null) html+= ets_type + "&nbsp;-&nbsp;";
                 html += ets_libelle + "</strong></span>";
                 html += "&nbsp;<span><small>" + ets_adresses + "</small></span>";
                 html += "<br /><span><small>#" + data.response.general.NUMEROID_ETABLISSEMENT + "</small></span>";

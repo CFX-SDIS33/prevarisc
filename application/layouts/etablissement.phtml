@@ -31,7 +31,7 @@
                 </a> - 
             <?php endforeach ?>
         <?php endif ?>
-        <?php echo file_exists(APPLICATION_PATH . DS . '..' . DS . 'public' . DS . 'images' . DS . 'types' . DS . 'b' . DS . 'icone-type-' . $this->etablissement['informations']['LIBELLE_TYPE_PRINCIPAL'] . '.png') ? "<img src='/images/types/b/icone-type-" . $this->etablissement['informations']['LIBELLE_TYPE_PRINCIPAL'] . ".png' title='" . $this->etablissement['informations']['LIBELLE_TYPE_PRINCIPAL'] . "' />" : ''; ?>
+        <?php echo $this->etablissement['informations']['LIBELLE_TYPE_PRINCIPAL']  . "&nbsp;-&nbsp;";?>
         <?php echo $this->etablissement['informations']["LIBELLE_ETABLISSEMENTINFORMATIONS"] ?>
         <?php if ($this->etablissement['general']['NUMEROID_ETABLISSEMENT']): ?>
             <span class="pull-right">
