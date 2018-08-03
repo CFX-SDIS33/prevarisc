@@ -730,10 +730,10 @@ class Service_Dossier
     public function isDossierDonnantAvis($dossier, $idNature) {
         
         return 
-            //Cas d'une étude uniquement dans le cas d'une levée de reserve
-            in_array($idNature, array(19, 7, 17, 16)) && $dossier->DATECOMM_DOSSIER
+            //Cas d'une étude uniquement dans le cas d'une levée de prescriptions
+            in_array($idNature, array(7, 17, 16)) && $dossier->DATECOMM_DOSSIER
             //Cas d'une viste uniquement dans le cas d'une VP, inopinée, avant ouverture ou controle
-            || in_array($idNature, array(21, 23, 24, 47)) && $dossier->DATEVISITE_DOSSIER
+            || in_array($idNature, array(19, 21, 23, 24, 47)) && $dossier->DATEVISITE_DOSSIER
             //Cas d'un groupe deviste uniquement dans le cas d'une VP, inopinée, avant ouverture ou controle
             || in_array($idNature, array(26, 28, 29, 48)) && $dossier->DATECOMM_DOSSIER;
     }

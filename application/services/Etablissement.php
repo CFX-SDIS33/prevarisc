@@ -80,8 +80,9 @@ class Service_Etablissement implements Service_Interface_Etablissement
                 ->setCriteria("e.ID_ETABLISSEMENT", $id_etablissement)
                     // Dossier type "Visite de commission" et "Groupe de visite"
                 ->setCriteria("d.TYPE_DOSSIER", array(2,3))
-                        // Dossier ayant un avis de commission rendu
-                ->setCriteria("d.AVIS_DOSSIER_COMMISSION > 0")
+                ->setCriteria("d.DATEVISITE_DOSSIER <= CURDATE()")
+                        // Dossier ayant un avis de commission rendu => Supprimé pour prendre en compte la dernière VP même si pas d'avis de commission rendu
+//                 ->setCriteria("d.AVIS_DOSSIER_COMMISSION > 0")
                     // Dossier nature "périodique" et autres types donnant avis de type "Visite de commission" et "Groupe de visite"
                 ->setCriteria("ID_NATURE", array(21,26,47,48))
                 ->order('DATEVISITE_DOSSIER DESC')

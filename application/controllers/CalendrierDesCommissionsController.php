@@ -124,49 +124,21 @@ class CalendrierDesCommissionsController extends Zend_Controller_Action
         $service_etablissement = new Service_Etablissement;
         $DB_prev = new Model_DbTable_DossierPreventionniste;
 
-        foreach($listeDossiersNonAffect as $indiceDossierNonAffecte => $dossierNonAffecte)
+        foreach($listeDossiersNonAffect as $val => $ue)
         {
             //On recupere la liste des établissements qui concernent le dossier
-            $listeEtab = $dbDossier->getEtablissementDossierGenConvoc($dossierNonAffecte['ID_DOSSIER']);
-            
-            if (isset($dossierNonAffecte['LIBELLE_ETABLISSEMENTINFORMATIONS'])) {
-            	// Info pour le tri auto des dossiers dans l'ODJ
-            	$etablissement[$indiceDossierNonAffecte] = $dossierNonAffecte['LIBELLE_ETABLISSEMENTINFORMATIONS'];
-            } else {
-            	$etablissement[$indiceDossierNonAffecte] = "";
-            }
+            $listeEtab = $dbDossier->getEtablissementDossierGenConvoc($ue['ID_DOSSIER']);
+            //on recupere la liste des infos des établissement
 
             if(count($listeEtab) > 0)
             {
-            	//on recupere la liste des infos des établissement
                 $etablissementInfos = $service_etablissement->get($listeEtab[0]['ID_ETABLISSEMENT']);
-                
-                if (!empty($etablissementInfos)) {
-                	$listeDossiersNonAffect[$indiceDossierNonAffecte]['infosEtab'] = $etablissementInfos;
-                	
-                	// Info pour le tri auto des dossiers dans l'ODJ
-                	if (isset($listeDossiersNonAffect[$indiceDossierNonAffecte]['infosEtab']['adresses'][0])) {
-                		$commune[$indiceDossierNonAffecte] = $listeDossiersNonAffect[$indiceDossierNonAffecte]['infosEtab']['adresses'][0]['LIBELLE_COMMUNE'];
-                	} else {
-                		$commune[$indiceDossierNonAffecte] = "";
-                	}
-                	
-                }
-                
-                $listeDocUrba = $dbDocUrba->getDossierDocUrba($dossierNonAffecte['ID_DOSSIER']);
-                $listeDossiersNonAffect[$indiceDossierNonAffecte]['listeDocUrba'] = $listeDocUrba;
+                $listeDossiersNonAffect[$val]['infosEtab'] = $etablissementInfos;
+                $listeDocUrba = $dbDocUrba->getDossierDocUrba($ue['ID_DOSSIER']);
+                $listeDossiersNonAffect[$val]['listeDocUrba'] = $listeDocUrba;
 
-                $listeDossiersNonAffect[$indiceDossierNonAffecte]['preventionnistes'] = $DB_prev->getPrevDossier( $dossierNonAffecte['ID_DOSSIER'] );
-            	
-            }  else {
-				$commune [$indiceDossierNonAffecte] = "";
-			}
-        }
-        
-        // Trie les données par commune croissante, établissement croissant
-        // Ajoute $data en tant que dernier paramètre, pour trier par la clé commune
-        if (!empty($commune) && !empty($etablissement) && !empty($listeDossiersNonAffect)) {
-        	array_multisort($commune, SORT_ASC, $etablissement, SORT_ASC, $listeDossiersNonAffect);
+                $listeDossiersNonAffect[$val]['preventionnistes'] = $DB_prev->getPrevDossier( $ue['ID_DOSSIER'] );
+            }
         }
 		
         //Gestion de l'affichage de la date de la commission
@@ -1180,9 +1152,9 @@ class CalendrierDesCommissionsController extends Zend_Controller_Action
 		$model_utilisateurInfo = new Model_DbTable_UtilisateurInformations;
 	
 		if($commissionInfo['GESTION_HEURES'] == 1){
-			$listeDossiers = $dbDateCommPj->TESTRECUPDOSSHEURE($dateCommId);
+			$listeDossiers = $dbDateCommPj->getDossiersInfosByHour($dateCommId);
 		}else{
-			$listeDossiers = $dbDateCommPj->TESTRECUPDOSS($dateCommId);
+			$listeDossiers = $dbDateCommPj->getDossiersInfosByOrder($dateCommId);
 		}
 		
 		$dbDossier = new Model_DbTable_Dossier;
@@ -1237,9 +1209,9 @@ class CalendrierDesCommissionsController extends Zend_Controller_Action
 		$model_utilisateurInfo = new Model_DbTable_UtilisateurInformations;
 
 		if ($commissionInfo['GESTION_HEURES'] == 1){
-			$listeDossiers = $dbDateCommPj->TESTRECUPDOSSHEURE($dateCommId);
+			$listeDossiers = $dbDateCommPj->getDossiersInfosByHour($dateCommId);
 		} else {
-			$listeDossiers = $dbDateCommPj->TESTRECUPDOSS($dateCommId);
+			$listeDossiers = $dbDateCommPj->getDossiersInfosByOrder($dateCommId);
 		}
 		
 		$dbDossier = new Model_DbTable_Dossier;

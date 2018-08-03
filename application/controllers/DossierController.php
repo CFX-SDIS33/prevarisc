@@ -44,7 +44,9 @@ class DossierController extends Zend_Controller_Action
         //Utilisation exceptionnelle de locaux - OK
         "18" => array("DATEINSERT","REFCOURRIER","OBJET","NUMCHRONO","DATEMAIRIE","DATESECRETARIAT","COMMISSION","DESCGEN","DESCEFF","DATECOMM","AVIS","DATESDIS","PREVENTIONNISTE","ABSQUORUM","DEMANDEUR","INCOMPLET", "HORSDELAI","AVIS_COMMISSION","OBSERVATION"),
         //Levée de réserves - OK
-        "19" => array("DATEINSERT","REFCOURRIER","OBJET","NUMCHRONO","DATEMAIRIE","DATESECRETARIAT","COMMISSION","DESCGEN","DESCEFF","DATECOMM","AVIS","DATESDIS","PREVENTIONNISTE","ABSQUORUM","DEMANDEUR","AVIS_COMMISSION","OBSERVATION"),
+//         "19" => array("DATEINSERT","REFCOURRIER","OBJET","NUMCHRONO","DATEMAIRIE","DATESECRETARIAT","COMMISSION","DESCGEN","DESCEFF","DATECOMM","AVIS","DATESDIS","PREVENTIONNISTE","ABSQUORUM","DEMANDEUR","AVIS_COMMISSION","OBSERVATION"),
+    	//Levée de réserves - Passage en Type Visite avec les mêmes champs affichés que pour une Visite Avant Ouverture sauf "DATERVRAT"
+    	"19" => array("DATEINSERT","REFCOURRIER","OBJET","COMMISSION","DESCGEN","DESCEFF","DATEVISITE","COORDSSI","PREVENTIONNISTE","ABSQUORUM","NPSP","AVIS_COMMISSION","OBSERVATION","DELAIPRESC"),
         //Echéncier de travaux - OK
         "46" => array("DATEINSERT","REFCOURRIER","OBJET","NUMCHRONO","DATEMAIRIE","DATESECRETARIAT","COMMISSION","DESCGEN","DESCEFF","DATECOMM","AVIS","DATESDIS","PREVENTIONNISTE","DEMANDEUR","INCOMPLET","HORSDELAI","AVIS_COMMISSION","OBSERVATION"),
         //Déclaration préalable
@@ -924,7 +926,7 @@ class DossierController extends Zend_Controller_Action
 
             
             //Si le dossier est une levée de prescription ou de reserve on ajoute 5 "documents consultés" de type : Attestation de
-            if($this->_getParam('do') == 'new' && ($idNature == 7 || $idNature == 19) ){
+            if($this->_getParam('do') == 'new' && ($idNature == 7) ){
                 $dbListeDocAjout = new Model_DbTable_ListeDocAjout();
                 for($i = 0; $i <5; $i++){
                     $docAttestation = $dbListeDocAjout->createRow();
@@ -1485,7 +1487,7 @@ class DossierController extends Zend_Controller_Action
                 }
             } elseif (1 == $dossierType['TYPE_DOSSIER']) {
                 //cas d'une etude
-                if($nature['ID_NATURE'] == 19 || $nature['ID_NATURE'] == 7){
+                if($nature['ID_NATURE'] == 7){
                     $listeDocConsulte[$nature["ID_NATURE"]] = $dblistedoc->getDocVisite();
                 }else{
                     $listeDocConsulte[$nature["ID_NATURE"]] = $dblistedoc->getDocEtude();
@@ -2241,7 +2243,7 @@ class DossierController extends Zend_Controller_Action
             }
         } elseif (1 == $dossierType['TYPE_DOSSIER']) {
             //cas d'une etude
-            if($dossierNature['ID_NATURE'] == 19 || $dossierNature['ID_NATURE'] == 7){
+            if($dossierNature['ID_NATURE'] == 7){
                 $listeDocConsulte = $dblistedoc->getDocVisite();
             }else{
                 $listeDocConsulte = $dblistedoc->getDocEtude();
@@ -2266,9 +2268,9 @@ class DossierController extends Zend_Controller_Action
         //PARTIE PRESCRIPTION
         //Cas particulier pour les centres commerciaux (id_typeactivite = 29)
         //Les dossiers ayant pour nature VP,VI et VC  21,26,24,29,23,28
-        $natureCC = array(21,26,24,29,23,28);
+        $natureCC = array(19,21,26,24,29,23,28);
         //Les dossiers ayant pour nature LR et LP 7,19
-        $natureCCL = array(7,19);
+        $natureCCL = array(7);
 
         if($this->view->id_typeactivite == 29 && in_array($dossierNature["ID_NATURE"], $natureCC) && isset($affectDossier) && !$this->_getParam("repriseCC") ){
             //On récupère toutes les cellules

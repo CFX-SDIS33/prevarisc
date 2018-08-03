@@ -409,7 +409,7 @@ class Service_Dashboard
                     $idLien = $lien['ID_DOSSIER1'];
                 }
                 $idNature = $DBdossierNautre->getDossierNaturesId($idLien)['ID_NATURE'];
-                if($idNature == 19 || $idNature == 7 || $idNature == 46){
+                if($idNature == 7 || $idNature == 46){
                     unset($dossiers[$valCpt]);
                 }
             }

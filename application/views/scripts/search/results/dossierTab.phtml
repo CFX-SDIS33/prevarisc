@@ -32,23 +32,31 @@
     <?php /* Etablissement */ ?>
     <td class="doss-nom">
 
-
-
         <a href='/etablissement/index/id/<?php echo $this->ID_ETABLISSEMENT ?>' title='<?php echo htmlspecialchars($this->LIBELLE_ETABLISSEMENTINFORMATIONS , ENT_QUOTES) ?>'>
-            <?php echo $this->LIBELLE_ETABLISSEMENTINFORMATIONS  ?>
+            <?php echo $this->LIBELLE_ETABLISSEMENTINFORMATIONS ?>
         </a>
         <br/>
-        <?php /* Affichage du libellé du type */ ?>
-        <small style='display: inline-block; width: 65px'>
+        
+        <?php /* Affichage du libellé de la commune */ ?>
+        <small style='display: inline-block'>
+            <strong>
+            <?php echo $this->LIBELLE_COMMUNE ?>
+            </strong>
+        </small>
+        <br />
+        
+        <?php /* Affichage du libellé du type  et de la catégorie */ ?>
+        <small style='display: inline-block'>
             <strong>
             <?php
                 if($this->ID_TYPE) {
                 	echo $this->LIBELLE_TYPE . "&nbsp;-&nbsp;";
                 }
-                echo strtoupper(substr($this->LIBELLE_GENRE, 0 , 4));
+                echo $this->ID_CATEGORIE;
             ?>
             </strong>
         </small>
+        
     </td>
 
     <?php /* Icone représentant le dropdown des fils */ ?>
@@ -167,9 +175,11 @@
     <td colspan="5">
         <?php if($this->PIECESJOINTES != null) : ?>
             <?php foreach ($this->PIECESJOINTES as $piecejointe) : ?>
-              <a href='#' title='<?php echo htmlspecialchars($piecejointe['NOM_PIECEJOINTE'] , ENT_QUOTES) ?>'>
-                <?php echo $piecejointe['NOM_PIECEJOINTE'].$piecejointe['EXTENSION_PIECEJOINTE'] ?>
-              </a><br/>
+            	<a 
+            class="file <?php echo substr(strtolower($piecejointe['EXTENSION_PIECEJOINTE']), 1, 3) ?>"
+            href='<?php echo $this->url(array('controller' => 'piece-jointe', 'action' => 'get', 'id' => $piecejointe['ID_DOSSIER'], 'idpj' => $piecejointe['ID_PIECEJOINTE'], 'type' => 'dossier')) ?>' <?php if ($piecejointe['DESCRIPTION_PIECEJOINTE']): ?> title="<?php echo $piecejointe['DESCRIPTION_PIECEJOINTE'] ?>" <?php endif ?> target='_blank' ><?php echo $piecejointe['NOM_PIECEJOINTE'].$piecejointe['EXTENSION_PIECEJOINTE'] ?></a>
+               
+              <br/> 
             <?php endforeach ?>
         <?php endif ?>
     </td>

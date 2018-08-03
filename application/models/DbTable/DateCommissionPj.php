@@ -68,6 +68,7 @@ class Model_DbTable_DateCommissionPj extends Zend_Db_Table_Abstract
 
         return $this->getAdapter()->fetchAll($select);
     }
+    
 
     public function getDossiersInfosByOrder($dateCommId)
     {
@@ -77,57 +78,24 @@ class Model_DbTable_DateCommissionPj extends Zend_Db_Table_Abstract
 			->from(array('doss' => 'dossier'))
 			->join(array('dossAffect' => 'dossieraffectation'),'doss.ID_DOSSIER = dossAffect.ID_DOSSIER_AFFECT')
 			->join(array('dateComm' => 'datecommission'),'dossAffect.ID_DATECOMMISSION_AFFECT = dateComm.ID_DATECOMMISSION')
-			/*
 			->join(array('etabDoss' => 'etablissementdossier'),'etabDoss.ID_DOSSIER = doss.ID_DOSSIER')
-			->join(array('etabInfos' => 'etablissementinformations'),'etabInfos.ID_ETABLISSEMENT = etabDoss.ID_ETABLISSEMENT AND etabInfos.DATE_ETABLISSEMENTINFORMATIONS = ( SELECT MAX(DATE_ETABLISSEMENTINFORMATIONS) FROM  etablissementinformations WHERE ID_ETABLISSEMENT = etabDoss.ID_ETABLISSEMENT)')
+			->join(array('etabInfos' => 'etablissementinformations'),'etabInfos.ID_ETABLISSEMENT = etabDoss.ID_ETABLISSEMENT AND etabInfos.DATE_ETABLISSEMENTINFORMATIONS = ( SELECT MAX(DATE_ETABLISSEMENTINFORMATIONS) FROM  etablissementinformations WHERE ID_ETABLISSEMENT = etabDoss.ID_ETABLISSEMENT)', "LIBELLE_ETABLISSEMENTINFORMATIONS")
 			->join(array('etabAdr' => 'etablissementadresse'),'etabDoss.ID_ETABLISSEMENT = etabAdr.ID_ETABLISSEMENT')
-			->join(array('adrComm' => 'adressecommune'),'etabAdr.NUMINSEE_COMMUNE = adrComm.NUMINSEE_COMMUNE')
-			*/
+			->join(array('adrComm' => 'adressecommune'),'etabAdr.NUMINSEE_COMMUNE = adrComm.NUMINSEE_COMMUNE', "LIBELLE_COMMUNE")
 			->join(array('dossNat' => 'dossiernature'),'dossNat.ID_DOSSIER = doss.ID_DOSSIER')
 			->join(array('dossNatListe' => 'dossiernatureliste'),'dossNat.ID_NATURE = dossNatListe.ID_DOSSIERNATURE')
 			//->joinLeft(array('docurba' => 'dossierdocurba'),'docurba.ID_DOSSIER = doss.ID_DOSSIER')
 			->where('dateComm.ID_DATECOMMISSION = ?',$dateCommId)
 			->group('doss.ID_DOSSIER')
-			->order('dossAffect.NUM_DOSSIER');
+// 			->order('dossAffect.NUM_DOSSIER');
+			->order("adrComm.LIBELLE_COMMUNE")
+			->order("etabInfos.LIBELLE_ETABLISSEMENTINFORMATIONS");
 		
 		//echo $select->__toString();
 		
         return $this->getAdapter()->fetchAll($select);
     }
 
-	public function TESTRECUPDOSS($dateCommId)
-    {
-		$select = $this->select()
-			->setIntegrityCheck(false)
-			->from(array('doss' => 'dossier'))
-			->join(array('dossAffect' => 'dossieraffectation'),'doss.ID_DOSSIER = dossAffect.ID_DOSSIER_AFFECT')
-			->join(array('dateComm' => 'datecommission'),'dossAffect.ID_DATECOMMISSION_AFFECT = dateComm.ID_DATECOMMISSION')
-			->join(array('dossNat' => 'dossiernature'),'dossNat.ID_DOSSIER = doss.ID_DOSSIER')
-			->join(array('dossNatListe' => 'dossiernatureliste'),'dossNat.ID_NATURE = dossNatListe.ID_DOSSIERNATURE')
-			->where('dateComm.ID_DATECOMMISSION = ?',$dateCommId)
-			->group('doss.ID_DOSSIER')
-			->order('dossAffect.NUM_DOSSIER');
-
-        return $this->getAdapter()->fetchAll($select);
-    }
-	
-	public function TESTRECUPDOSSHEURE($dateCommId)
-    {
-		$select = $this->select()
-			->setIntegrityCheck(false)
-			->from(array('doss' => 'dossier'))
-			->join(array('dossAffect' => 'dossieraffectation'),'doss.ID_DOSSIER = dossAffect.ID_DOSSIER_AFFECT')
-			->join(array('dateComm' => 'datecommission'),'dossAffect.ID_DATECOMMISSION_AFFECT = dateComm.ID_DATECOMMISSION')
-			->join(array('dossNat' => 'dossiernature'),'dossNat.ID_DOSSIER = doss.ID_DOSSIER')
-			->join(array('dossNatListe' => 'dossiernatureliste'),'dossNat.ID_NATURE = dossNatListe.ID_DOSSIERNATURE')
-			->where('dateComm.ID_DATECOMMISSION = ?',$dateCommId)
-			->where('dossAffect.HEURE_DEB_AFFECT IS NOT NULL')
-			->group('doss.ID_DOSSIER')
-			->order('dossAffect.HEURE_DEB_AFFECT');
-
-        return $this->getAdapter()->fetchAll($select);
-    }
-	
 	public function getPjInfos($idComm)
 	{
 		$select = $this->select()
