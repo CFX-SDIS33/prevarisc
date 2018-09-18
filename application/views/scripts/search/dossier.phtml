@@ -348,14 +348,14 @@
 
     function masquerBoutonExportCalc ()
     {	
-    	<?php if($this->results->getTotalItemCount() <= 10000 && $this->is_allowed_export_calc) :?>
+    	<?php if(count($this->results) > 0 && $this->results->getTotalItemCount() <= 10000 && $this->is_allowed_export_calc) :?>
     		document.getElementById('exporter').style.display = "none"
     	<?php endif ?>
     }
 
     function afficherBoutonExportCalc ()
     {
-    	<?php if($this->results->getTotalItemCount() <= 10000 && $this->is_allowed_export_calc) :?>
+    	<?php if(count($this->results) > 0 && $this->results->getTotalItemCount() <= 10000 && $this->is_allowed_export_calc) :?>
     		document.getElementById('exporter').style.display = "inline"
     	<?php endif ?>
     }
