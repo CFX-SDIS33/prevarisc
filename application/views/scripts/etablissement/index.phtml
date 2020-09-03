@@ -247,28 +247,92 @@
                 <?php if( count($this->etablissement['adresses']) > 0 && $this->key_googlemap != null && $this->etablissement['adresses'][0]['LAT_ETABLISSEMENTADRESSE'] != null && $this->etablissement['adresses'][0]['LON_ETABLISSEMENTADRESSE'] != null) : ?>
                     <li class='tabs-right' ><a href='#googlemap' data-toggle="tab">Carte Google</a></li>
                 <?php endif ?>
+		<?php if( count($this->etablissement['adresses']) > 0 && $this->geoconcept_url != null && $this->etablissement['adresses'][0]['LAT_ETABLISSEMENTADRESSE'] != null && $this->etablissement['adresses'][0]['LON_ETABLISSEMENTADRESSE'] != null) : ?>
+                    <li class='tabs-right' ><a href='#geoconcept' data-toggle="tab">Carte GeoConcept</a></li>
+                <?php endif ?>
             </ul>
             <div id="reponse-modal" class="modal hide fade"></div>
             <div class="tab-content">
                 <?php if( count($this->etablissement['adresses']) > 0 && $this->key_ign != null && $this->etablissement['adresses'][0]['LAT_ETABLISSEMENTADRESSE'] != null && $this->etablissement['adresses'][0]['LON_ETABLISSEMENTADRESSE'] != null) : ?>
-                <div id='geoportail' class="tab-pane in" style="height: 350px; max-height: 350px;">
-                    <div id='geoportail-container'  style="height: 100%; max-height: 100%;"></div>
-                    <script type="text/javascript" src="//api.ign.fr/geoportail/api/js/2.1.2/GeoportalExtended.js"></script>
+		    <div id="geoportail" class="tab-pane active" style="height: 350px; max-height: 350px;">
+                    <div id="geoportail-container" style="height: 100%; max-height: 100%;"></div>
+                    <!-- SDK Géoportail -->
+                    <script src="/sdk_geoportail/GpSDK3D.js"></script>
+                    <link rel="stylesheet" href="/sdk_geoportail/GpSDK3D.css" />
+                    <!-- FIN SDK -->
+                    <script src="/js/main.js"></script>
+                    <!-- Déplacement du bouton FullScreen (sinon supperposé avec le gestionnaire de couches)
+                    et du panel Profil Altimétrique (sinon coupé en 2) -->
+                    <style>
+                    .ol-full-screen {right:9px; top:49px}
+                    div[id^=GPelevationPathPanel-] {top:-75px;}
+                    </style>
+                    <script type="text/javascript">
+                        <?php
+                            $public_dir = $_SERVER['DOCUMENT_ROOT'];
+                            $autoconf_path = getenv('PREVARISC_IGN_AUTOCONF');
+                            $autoconf_path = file_exists($public_dir.$autoconf_path) ? $autoconf_path : "";
+                        ?>
+                        viewer = initViewer('geoportail-container',
+                                            '<?php echo $this->key_ign ?>',
+                                            [<?php echo $this->etablissement['adresses'][0]['LON_ETABLISSEMENTADRESSE'] ?>,
+                                             <?php echo $this->etablissement['adresses'][0]['LAT_ETABLISSEMENTADRESSE'] ?>],
+                                            "<b><?php echo $this->etablissement['informations']['LIBELLE_ETABLISSEMENTINFORMATIONS'] ?></b><br/>"+
+                                                "<?php echo $this->etablissement['adresses'][0]['NUMERO_ADRESSE'] ?>, "
+                                                +"<?php echo $this->etablissement['adresses'][0]['LIBELLE_RUE'] ?><br/>"+
+                                                "<?php echo $this->etablissement['adresses'][0]['CODEPOSTAL_COMMUNE'] ?> "+ 
+                                                "<?php echo $this->etablissement['adresses'][0]['LIBELLE_COMMUNE'] ?>",
+                                                '<?php echo $autoconf_path ?>');
+                            
+                        viewer.listen('mapLoaded', afterInitMap);
+                        viewer.listen('azimuthChanged', onRotation);
+                        function afterInitMap () {
+                            // Ajout du bouton FullScreen sur la carte
+                            var fsControl = new ol.control.FullScreen({});
+                            viewer.getLibMap().addControl(fsControl);
+                            viewer = addUserLayers(viewer,
+                                                   '<?php echo $this->key_ign ?>',
+                                                   <?php echo json_encode($this->couches_cartographiques) ?>);
+                            $('.ol-rotate').css('display', 'none');
+                        };
+                        function onRotation () {
+                            viewer.getAzimuth() === 0 ? $('.ol-rotate').css('display', 'none') : $('.ol-rotate').css('display', 'block');
+                        };
+                        </script>
+                    </div>
+                <?php endif ?>
+                
+                <?php if( count($this->etablissement['adresses']) > 0 && $this->geoconcept_url != null && $this->etablissement['adresses'][0]['LAT_ETABLISSEMENTADRESSE'] != null && $this->etablissement['adresses'][0]['LON_ETABLISSEMENTADRESSE'] != null) : ?>
+                <div id='geoconcept' class="tab-pane in" style="height: 350px; max-height: 350px;width: 100%">
+                    <div id='geoconcept-container'  style="height: 100%; max-height: 100%;width: 100%"></div>
+                    <script type="text/javascript" src="/js/geoconcept/OpenLayers.js"></script>
+                    <script type="text/javascript" src="/js/geoconcept/proj4js.js"></script>
+                    <script type="text/javascript" src="/js/geoconcept/htc-lite.js"></script>
+                    <?php if ($projection = getenv('PREVARISC_PLUGIN_GEOCONCEPT_PROJECTION')): ?>
+                    <script type="text/javascript" src="/js/geoconcept/defs/<?php echo $projection ?>.js"></script>
+                    <?php endif ?>
+                    <script type="text/javascript" src="/js/geoconcept/geoconcept.js"></script>
+                    <link rel="stylesheet" href="/css/geoconcept/htc.css"/>
                     <script>
                         $(document).ready(function() {
+                            <?php if ($token = getenv('PREVARISC_PLUGIN_GEOCONCEPT_TOKEN') && $app_id = getenv('PREVARISC_PLUGIN_GEOCONCEPT_APP_ID')): ?>
+                                initGeoConceptKey('<?php echo $app_id ?>', '<?php echo $token ?>');
+                            <?php endif ?>
+                                
                             var points = [];
                             <?php foreach($this->etablissement['adresses'] as $adresse): ?>
-                                points.push({
-                                    lat: <?php echo $adresse['LAT_ETABLISSEMENTADRESSE'] ?>,
-                                    lon: <?php echo $adresse['LON_ETABLISSEMENTADRESSE'] ?>,
-                                    description: "<?php echo htmlentities(strtolower($adresse["NUMERO_ADRESSE"]." ".$adresse["LIBELLE_RUE"]." ".$adresse["CODEPOSTAL_COMMUNE"]). " " .$adresse["LIBELLE_COMMUNE"])." <br />" ?>"
-                                                + "long=<?php echo $adresse['LON_ETABLISSEMENTADRESSE'] ?>, lat=<?php echo $adresse['LAT_ETABLISSEMENTADRESSE'] ?>"
-                                });
+                                <?php if ($adresse['LAT_ETABLISSEMENTADRESSE'] && $adresse['LON_ETABLISSEMENTADRESSE']): ?>
+                                    points.push({
+                                        lat: <?php echo $adresse['LAT_ETABLISSEMENTADRESSE'] ?>,
+                                        lon: <?php echo $adresse['LON_ETABLISSEMENTADRESSE'] ?>,
+                                        description: "<?php echo htmlentities(strtolower($adresse["NUMERO_ADRESSE"]." ".$adresse["LIBELLE_RUE"]." ".$adresse["CODEPOSTAL_COMMUNE"]). " " .$adresse["LIBELLE_COMMUNE"])." <br />" ?>"
+                                                    + "long=<?php echo $adresse['LON_ETABLISSEMENTADRESSE'] ?>, lat=<?php echo $adresse['LAT_ETABLISSEMENTADRESSE'] ?>"
+                                    });
+                                <?php endif ?>
                             <?php endforeach ?>
-
-                            viewer = initViewer(
-                                "geoportail-container",
-                                "<?php echo $this->key_ign ?>",
+                            map = initGeoConceptViewer('geoconcept-container', 
+                                "<?php echo $this->geoconcept_url ?>",
+                                "<?php echo getenv('PREVARISC_PLUGIN_GEOCONCEPT_LAYER') ?>",
                                 points,
                                 <?php echo json_encode($this->couches_cartographiques) ?>
                             );
@@ -296,7 +360,6 @@
                                 map: map,
                                 title: "<?php echo $this->etablissement['informations']['LIBELLE_ETABLISSEMENTINFORMATIONS'] ?>"
                             });
-
                            var infowindow = new google.maps.InfoWindow({
                                 content:
                                 "<?php echo $this->etablissement['adresses'][0]['NUMERO_ADRESSE'] ?>, "+
@@ -306,7 +369,6 @@
                             });
                             infowindow.open(map,marker);
                           };
-
                           google.maps.event.addDomListener(window, 'load', initialize);
                       </script>
                 </div>

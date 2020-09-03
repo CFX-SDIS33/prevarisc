@@ -169,7 +169,7 @@ class SearchController extends Zend_Controller_Action
 							if ($row ['DATE_VISITE_PREVUE'] != '') {
 								
 								$dateVisitePrevue = explode ( "-", $row ['DATE_VISITE_PREVUE'] );
-								$datetimeVisitePrevue = PHPExcel_Shared_Date::FormattedPHPToExceel ( $dateVisitePrevue [0], $dateVisitePrevue [1], $dateVisitePrevue [2] );
+								$datetimeVisitePrevue = PHPExcel_Shared_Date::FormattedPHPToExcel ( $dateVisitePrevue [0], $dateVisitePrevue [1], $dateVisitePrevue [2] );
 								$sheet->setCellValueByColumnAndRow ( 17, $ligne, $datetimeVisitePrevue );
 								$sheet->getStyleByColumnAndRow ( 17, $ligne )->getNumberFormat ()->setFormatCode ( PHPExcel_Style_NumberFormat::FORMAT_DATE_DDMMYYYY );
 							
@@ -381,56 +381,62 @@ class SearchController extends Zend_Controller_Action
 						
 						// Si premier affichage de la page
 						if (! isset ( $_GET ['Rechercher'] )) {
+							
 							// Si l'utilisateur est rattaché à un groupement territorial, présélection de celui-ci dans le filtre
 							$service_user = new Service_User ();
 							$this->view->user = $service_user->find ( Zend_Auth::getInstance ()->getIdentity () ['ID_UTILISATEUR'] );
-						}
-						
-						try {
 							
-							$parameters = $this->_request->getQuery ();
-							$page = array_key_exists ( 'page', $parameters ) ? $parameters ['page'] : null;
-							$label = array_key_exists ( 'label', $parameters ) && $parameters ['label'] != '' && ( string ) $parameters ['label'] [0] != '#' ? $parameters ['label'] : null;
-							$identifiant = array_key_exists ( 'label', $parameters ) && $parameters ['label'] != '' && ( string ) $parameters ['label'] [0] == '#' ? substr ( $parameters ['label'], 1 ) : null;
-							$genres = array_key_exists ( 'genres', $parameters ) ? $parameters ['genres'] : null;
-							$categories = array_key_exists ( 'categories', $parameters ) ? $parameters ['categories'] : null;
-							$classes = array_key_exists ( 'classes', $parameters ) ? $parameters ['classes'] : null;
-							$familles = array_key_exists ( 'familles', $parameters ) ? $parameters ['familles'] : null;
-							$types_activites = array_key_exists ( 'types_activites', $parameters ) ? $parameters ['types_activites'] : null;
-							$avis_favorable = array_key_exists ( 'avis', $parameters ) && count ( $parameters ['avis'] ) == 1 ? $parameters ['avis'] [0] == 'true' : null;
-							$statuts = array_key_exists ( 'statuts', $parameters ) ? $parameters ['statuts'] : null;
-							$local_sommeil = array_key_exists ( 'presences_local_sommeil', $parameters ) && count ( $parameters ['presences_local_sommeil'] ) == 1 ? $parameters ['presences_local_sommeil'] [0] == 'true' : null;
-							$city = array_key_exists ( 'city', $parameters ) && $parameters ['city'] != '' ? $parameters ['city'] : null;
-							$street = array_key_exists ( 'street', $parameters ) && $parameters ['street'] != '' ? $parameters ['street'] : null;
-							$commissions = array_key_exists ( 'commissions', $parameters ) && $parameters ['commissions'] != '' ? $parameters ['commissions'] : null;
-							if (array_key_exists ( 'groupements_territoriaux', $parameters ) && $parameters ['groupements_territoriaux'] != '') {
-								$groupements_territoriaux = $parameters ['groupements_territoriaux'];
-							} else {
-								if ($this->view->user != null && array_key_exists ( 'groupements', $this->view->user ) && count ( $this->view->user ['groupements'] ) > 0) {
-									$groupements_territoriaux = array ();
-									foreach ( $this->view->user ['groupements'] as $groupement ) {
-										if ($groupement ['ID_GROUPEMENT'] != null) {
-											array_push ( $groupements_territoriaux, $groupement ['ID_GROUPEMENT'] );
-										}
-									}
+							// Exécution de la recherche uniquement si ce n'est pas le premier affichage de la page (arrivée sur l'écran avec liste vierge)
+						} else {
+							
+							try {
+								
+								$parameters = $this->_request->getQuery ();
+								$page = array_key_exists ( 'page', $parameters ) ? $parameters ['page'] : null;
+								$label = array_key_exists ( 'label', $parameters ) && $parameters ['label'] != '' && ( string ) $parameters ['label'] [0] != '#' ? $parameters ['label'] : null;
+								$identifiant = array_key_exists ( 'label', $parameters ) && $parameters ['label'] != '' && ( string ) $parameters ['label'] [0] == '#' ? substr ( $parameters ['label'], 1 ) : null;
+								$genres = array_key_exists ( 'genres', $parameters ) ? $parameters ['genres'] : null;
+								$categories = array_key_exists ( 'categories', $parameters ) ? $parameters ['categories'] : null;
+								$classes = array_key_exists ( 'classes', $parameters ) ? $parameters ['classes'] : null;
+								$familles = array_key_exists ( 'familles', $parameters ) ? $parameters ['familles'] : null;
+								$types_activites = array_key_exists ( 'types_activites', $parameters ) ? $parameters ['types_activites'] : null;
+								$avis_favorable = array_key_exists ( 'avis', $parameters ) && count ( $parameters ['avis'] ) == 1 ? $parameters ['avis'] [0] == 'true' : null;
+								$statuts = array_key_exists ( 'statuts', $parameters ) ? $parameters ['statuts'] : null;
+								$local_sommeil = array_key_exists ( 'presences_local_sommeil', $parameters ) && count ( $parameters ['presences_local_sommeil'] ) == 1 ? $parameters ['presences_local_sommeil'] [0] == 'true' : null;
+								$city = array_key_exists ( 'city', $parameters ) && $parameters ['city'] != '' ? $parameters ['city'] : null;
+								$street = array_key_exists ( 'street', $parameters ) && $parameters ['street'] != '' ? $parameters ['street'] : null;
+								$commissions = array_key_exists ( 'commissions', $parameters ) && $parameters ['commissions'] != '' ? $parameters ['commissions'] : null;
+								if (array_key_exists ( 'groupements_territoriaux', $parameters ) && $parameters ['groupements_territoriaux'] != '') {
+									$groupements_territoriaux = $parameters ['groupements_territoriaux'];
 								} else {
-									$groupements_territoriaux = null;
+									if ($this->view->user != null && array_key_exists ( 'groupements', $this->view->user ) && count ( $this->view->user ['groupements'] ) > 0) {
+										$groupements_territoriaux = array ();
+										foreach ( $this->view->user ['groupements'] as $groupement ) {
+											if ($groupement ['ID_GROUPEMENT'] != null) {
+												array_push ( $groupements_territoriaux, $groupement ['ID_GROUPEMENT'] );
+											}
+										}
+									} else {
+										$groupements_territoriaux = null;
+									}
 								}
+								
+								$search = $service_search->etablissements ( $label, $identifiant, $genres, $categories, $classes, $familles, $types_activites, $avis_favorable, $statuts, $local_sommeil, null, null, null, $city, $street, $commissions, $groupements_territoriaux, 50, $page );
+								
+								$paginator = new Zend_Paginator ( new SDIS62_Paginator_Adapter_Array ( $search ['results'], $search ['search_metadata'] ['count'] ) );
+								$paginator->setItemCountPerPage ( 50 )->setCurrentPageNumber ( $page )->setDefaultScrollingStyle ( 'Elastic' );
+								
+								$this->view->results = $paginator;
+							} catch ( Exception $e ) {
+								$this->_helper->flashMessenger ( array (
+										'context' => 'error',
+										'title' => 'Problème de recherche',
+										'message' => 'La recherche n\'a pas été effectué correctement. Veuillez rééssayez. (' . $e->getMessage () . ')'
+								) );
 							}
 							
-							$search = $service_search->etablissements ( $label, $identifiant, $genres, $categories, $classes, $familles, $types_activites, $avis_favorable, $statuts, $local_sommeil, null, null, null, $city, $street, $commissions, $groupements_territoriaux, 50, $page );
-							
-							$paginator = new Zend_Paginator ( new SDIS62_Paginator_Adapter_Array ( $search ['results'], $search ['search_metadata'] ['count'] ) );
-							$paginator->setItemCountPerPage ( 50 )->setCurrentPageNumber ( $page )->setDefaultScrollingStyle ( 'Elastic' );
-							
-							$this->view->results = $paginator;
-						} catch ( Exception $e ) {
-							$this->_helper->flashMessenger ( array (
-									'context' => 'error',
-									'title' => 'Problème de recherche',
-									'message' => 'La recherche n\'a pas été effectué correctement. Veuillez rééssayez. (' . $e->getMessage () . ')' 
-							) );
 						}
+						
 					}
         				
         		}
@@ -633,62 +639,67 @@ class SearchController extends Zend_Controller_Action
         			
         			// Si premier affichage de la page
         			if (! isset ( $_GET ['Rechercher'] )) {
+        				
         				// Si l'utilisateur est rattaché à un groupement territorial, présélection de celui-ci dans le filtre
         				$service_user = new Service_User ();
         				$this->view->user = $service_user->find ( Zend_Auth::getInstance ()->getIdentity () ['ID_UTILISATEUR'] );
-        			}
-        			
-        			try {
-        				$parameters = $this->_request->getQuery();
-        				$page = array_key_exists('page', $parameters) ? $parameters['page'] : 1;
-        				$num_doc_urba = array_key_exists('permis', $parameters) && $parameters['permis'] != '' ? $parameters['permis'] : null;
-        				$objet = array_key_exists('objet', $parameters) && $parameters['objet'] != ''  && (string) $parameters['objet'][0] != '#'? $parameters['objet'] : null;
-        				$types = array_key_exists('types', $parameters) ? $parameters['types'] : null;
-        				$criteresRecherche = array();
-        				$criteresRecherche['commissions'] = array_key_exists('commissions', $parameters) ? $parameters['commissions'] : null;
-        				$criteresRecherche['avisCommission'] = array_key_exists('avisCommission', $parameters) ? $parameters['avisCommission'] : null;
-        				$criteresRecherche['avisRapporteur'] = array_key_exists('avisRapporteur', $parameters) ? $parameters['avisRapporteur'] : null;
-        				$criteresRecherche['avisDiffere'] = array_key_exists('avisDiffere', $parameters ) && count ( $parameters ['avisDiffere'] ) == 1 ? $parameters ['avisDiffere'] [0] == 'true' : null;
-        				$criteresRecherche['commune'] = array_key_exists('commune', $parameters) && $parameters['commune'] != '' ? $parameters['commune'] : null;
-        				$criteresRecherche['voie'] = array_key_exists('voie', $parameters) && $parameters['voie'] != '' ? $parameters['voie'] : null;
-        				$criteresRecherche['courrier'] = array_key_exists('courrier', $parameters) && $parameters['courrier'] != '' ? $parameters['courrier'] : null;
-        				$criteresRecherche['preventionniste'] = array_key_exists('preventionniste', $parameters) && $parameters['preventionniste'] != '' ? $parameters['preventionniste'] : null;
-        				$criteresRecherche['dateCreationStart'] = array_key_exists('date-creation-start', $parameters) && $checkDateFormat($parameters['date-creation-start']) ? $parameters['date-creation-start'] : null;
-        				$criteresRecherche['dateCreationEnd'] = array_key_exists('date-creation-end', $parameters) && $checkDateFormat($parameters['date-creation-end']) ? $parameters['date-creation-end'] : null;
-        				$criteresRecherche['dateReceptionStart'] = array_key_exists('date-reception-start', $parameters) && $checkDateFormat($parameters['date-reception-start']) ? $parameters['date-reception-start'] : null;
-        				$criteresRecherche['dateReceptionEnd'] = array_key_exists('date-reception-end', $parameters) && $checkDateFormat($parameters['date-reception-end']) ? $parameters['date-reception-end'] : null;
-        				$criteresRecherche['dateReponseStart'] = array_key_exists('date-reponse-start', $parameters) && $checkDateFormat($parameters['date-reponse-start']) ? $parameters['date-reponse-start'] : null;
-        				$criteresRecherche['dateReponseEnd'] = array_key_exists('date-reponse-end', $parameters) && $checkDateFormat($parameters['date-reponse-end']) ? $parameters['date-reponse-end'] : null;
-        				$criteresRecherche['dateCommissionStart'] = array_key_exists('date-commission-start', $parameters) && $checkDateFormat($parameters['date-commission-start']) ? $parameters['date-commission-start'] : null;
-        				$criteresRecherche['dateCommissionEnd'] = array_key_exists('date-commission-end', $parameters) && $checkDateFormat($parameters['date-commission-end']) ? $parameters['date-commission-end'] : null;
-        				$criteresRecherche['dateVisiteStart'] = array_key_exists('date-visite-start', $parameters) && $checkDateFormat($parameters['date-visite-start']) ? $parameters['date-visite-start'] : null;
-        				$criteresRecherche['dateVisiteEnd'] = array_key_exists('date-visite-end', $parameters) && $checkDateFormat($parameters['date-visite-end']) ? $parameters['date-visite-end'] : null;
-        				if (array_key_exists ( 'groupements_territoriaux', $parameters ) && $parameters ['groupements_territoriaux'] != '') {
-        					$criteresRecherche['groupements_territoriaux'] = $parameters ['groupements_territoriaux'];
-        				} else {
-        					if ($this->view->user != null && array_key_exists ( 'groupements', $this->view->user ) && count ( $this->view->user ['groupements'] ) > 0) {
-        						$criteresRecherche['groupements_territoriaux'] = array ();
-        						foreach ( $this->view->user ['groupements'] as $groupement ) {
-        							if ($groupement ['ID_GROUPEMENT'] != null) {
-        								array_push ( $criteresRecherche['groupements_territoriaux'], $groupement ['ID_GROUPEMENT'] );
-        							}
-        						}
+        				
+        				// Exécution de la recherche uniquement si ce n'est pas le premier affichage de la page (arrivée sur l'écran avec liste vierge)
+        			} else {
+        				
+        				try {
+        					$parameters = $this->_request->getQuery();
+        					$page = array_key_exists('page', $parameters) ? $parameters['page'] : 1;
+        					$num_doc_urba = array_key_exists('permis', $parameters) && $parameters['permis'] != '' ? $parameters['permis'] : null;
+        					$objet = array_key_exists('objet', $parameters) && $parameters['objet'] != ''  && (string) $parameters['objet'][0] != '#'? $parameters['objet'] : null;
+        					$types = array_key_exists('types', $parameters) ? $parameters['types'] : null;
+        					$criteresRecherche = array();
+        					$criteresRecherche['commissions'] = array_key_exists('commissions', $parameters) ? $parameters['commissions'] : null;
+        					$criteresRecherche['avisCommission'] = array_key_exists('avisCommission', $parameters) ? $parameters['avisCommission'] : null;
+        					$criteresRecherche['avisRapporteur'] = array_key_exists('avisRapporteur', $parameters) ? $parameters['avisRapporteur'] : null;
+        					$criteresRecherche['avisDiffere'] = array_key_exists('avisDiffere', $parameters ) && count ( $parameters ['avisDiffere'] ) == 1 ? $parameters ['avisDiffere'] [0] == 'true' : null;
+        					$criteresRecherche['commune'] = array_key_exists('commune', $parameters) && $parameters['commune'] != '' ? $parameters['commune'] : null;
+        					$criteresRecherche['voie'] = array_key_exists('voie', $parameters) && $parameters['voie'] != '' ? $parameters['voie'] : null;
+        					$criteresRecherche['courrier'] = array_key_exists('courrier', $parameters) && $parameters['courrier'] != '' ? $parameters['courrier'] : null;
+        					$criteresRecherche['preventionniste'] = array_key_exists('preventionniste', $parameters) && $parameters['preventionniste'] != '' ? $parameters['preventionniste'] : null;
+        					$criteresRecherche['dateCreationStart'] = array_key_exists('date-creation-start', $parameters) && $checkDateFormat($parameters['date-creation-start']) ? $parameters['date-creation-start'] : null;
+        					$criteresRecherche['dateCreationEnd'] = array_key_exists('date-creation-end', $parameters) && $checkDateFormat($parameters['date-creation-end']) ? $parameters['date-creation-end'] : null;
+        					$criteresRecherche['dateReceptionStart'] = array_key_exists('date-reception-start', $parameters) && $checkDateFormat($parameters['date-reception-start']) ? $parameters['date-reception-start'] : null;
+        					$criteresRecherche['dateReceptionEnd'] = array_key_exists('date-reception-end', $parameters) && $checkDateFormat($parameters['date-reception-end']) ? $parameters['date-reception-end'] : null;
+        					$criteresRecherche['dateReponseStart'] = array_key_exists('date-reponse-start', $parameters) && $checkDateFormat($parameters['date-reponse-start']) ? $parameters['date-reponse-start'] : null;
+        					$criteresRecherche['dateReponseEnd'] = array_key_exists('date-reponse-end', $parameters) && $checkDateFormat($parameters['date-reponse-end']) ? $parameters['date-reponse-end'] : null;
+        					$criteresRecherche['dateCommissionStart'] = array_key_exists('date-commission-start', $parameters) && $checkDateFormat($parameters['date-commission-start']) ? $parameters['date-commission-start'] : null;
+        					$criteresRecherche['dateCommissionEnd'] = array_key_exists('date-commission-end', $parameters) && $checkDateFormat($parameters['date-commission-end']) ? $parameters['date-commission-end'] : null;
+        					$criteresRecherche['dateVisiteStart'] = array_key_exists('date-visite-start', $parameters) && $checkDateFormat($parameters['date-visite-start']) ? $parameters['date-visite-start'] : null;
+        					$criteresRecherche['dateVisiteEnd'] = array_key_exists('date-visite-end', $parameters) && $checkDateFormat($parameters['date-visite-end']) ? $parameters['date-visite-end'] : null;
+        					if (array_key_exists ( 'groupements_territoriaux', $parameters ) && $parameters ['groupements_territoriaux'] != '') {
+        						$criteresRecherche['groupements_territoriaux'] = $parameters ['groupements_territoriaux'];
         					} else {
-        						$criteresRecherche['groupements_territoriaux'] = null;
+        						if ($this->view->user != null && array_key_exists ( 'groupements', $this->view->user ) && count ( $this->view->user ['groupements'] ) > 0) {
+        							$criteresRecherche['groupements_territoriaux'] = array ();
+        							foreach ( $this->view->user ['groupements'] as $groupement ) {
+        								if ($groupement ['ID_GROUPEMENT'] != null) {
+        									array_push ( $criteresRecherche['groupements_territoriaux'], $groupement ['ID_GROUPEMENT'] );
+        								}
+        							}
+        						} else {
+        							$criteresRecherche['groupements_territoriaux'] = null;
+        						}
         					}
+        					$criteresRecherche['label'] = array_key_exists ( 'label', $parameters ) && $parameters ['label'] != '' && ( string ) $parameters ['label'] [0] != '#' ? $parameters ['label'] : null;
+        					$criteresRecherche['identifiant'] = array_key_exists ( 'label', $parameters ) && $parameters ['label'] != '' && ( string ) $parameters ['label'] [0] == '#' ? substr ( $parameters ['label'], 1 ) : null;
+        					
+        					$search = $service_search->dossiers($types, $objet, $num_doc_urba, null, null, 50, $page,$criteresRecherche);
+        					
+        					$paginator = new Zend_Paginator(new SDIS62_Paginator_Adapter_Array($search['results'], $search['search_metadata']['count']));
+        					$paginator->setItemCountPerPage(50)->setCurrentPageNumber($page)->setDefaultScrollingStyle('Elastic');
+        					
+        					$this->view->results = $paginator;
         				}
-        				$criteresRecherche['label'] = array_key_exists ( 'label', $parameters ) && $parameters ['label'] != '' && ( string ) $parameters ['label'] [0] != '#' ? $parameters ['label'] : null;
-        				$criteresRecherche['identifiant'] = array_key_exists ( 'label', $parameters ) && $parameters ['label'] != '' && ( string ) $parameters ['label'] [0] == '#' ? substr ( $parameters ['label'], 1 ) : null;
+        				catch(Exception $e) {
+        					$this->_helper->flashMessenger(array('context' => 'error','title' => 'Problème de recherche','message' => 'La recherche n\'a pas été effectué correctement. Veuillez rééssayez. (' . $e->getMessage() . ')'));
+        				}
         				
-        				$search = $service_search->dossiers($types, $objet, $num_doc_urba, null, null, 50, $page,$criteresRecherche);
-        				
-        				$paginator = new Zend_Paginator(new SDIS62_Paginator_Adapter_Array($search['results'], $search['search_metadata']['count']));
-        				$paginator->setItemCountPerPage(50)->setCurrentPageNumber($page)->setDefaultScrollingStyle('Elastic');
-        				
-        				$this->view->results = $paginator;
-        			}
-        			catch(Exception $e) {
-        				$this->_helper->flashMessenger(array('context' => 'error','title' => 'Problème de recherche','message' => 'La recherche n\'a pas été effectué correctement. Veuillez rééssayez. (' . $e->getMessage() . ')'));
         			}
         			
         		}
@@ -749,4 +760,5 @@ class SearchController extends Zend_Controller_Action
 
         echo $html;
     }
+    
 }

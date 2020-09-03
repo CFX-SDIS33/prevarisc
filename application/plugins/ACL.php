@@ -135,7 +135,11 @@ class Plugin_ACL extends Zend_Controller_Plugin_Abstract
                 $commissions = (array) $utilisateur['commissions'];
                 array_walk($commissions, function(&$val, $key) use(&$commissions){ $val = $commissions[$key]['ID_COMMISSION']; });
                 $commissions = implode('-', $commissions);
-
+				
+                $commune = 0;
+                if($utilisateur['NUMINSEE_COMMUNE'] != "null"){
+                	$commune = $utilisateur['NUMINSEE_COMMUNE'];
+                }
 
                 $privileges_role = $groupes_dbtable->find($utilisateur['ID_GROUPE'])->current()->findModel_DbTable_PrivilegeViaModel_DbTable_GroupePrivilege()->toArray();
                 array_walk($privileges_role, function(&$val, $key) use(&$privileges_role){ $val = $privileges_role[$key]['id_privilege']; });
@@ -150,36 +154,36 @@ class Plugin_ACL extends Zend_Controller_Plugin_Abstract
                             case 'erp':
                                 if($resource_exploded[4] == '1') $resource_exploded[4] = $commissions;
                                 if($resource_exploded[5] == '1') $resource_exploded[5] = $groupements;
-                                if($resource_exploded[6] == '1') $resource_exploded[6] = $utilisateur['NUMINSEE_COMMUNE'];
+                                if($resource_exploded[6] == '1') $resource_exploded[6] = $commune;
                                 break;
                             case 'hab':
                                 if($resource_exploded[3] == '1') $resource_exploded[3] = $groupements;
-                                if($resource_exploded[4] == '1') $resource_exploded[4] = $utilisateur['NUMINSEE_COMMUNE'];
+                                if($resource_exploded[4] == '1') $resource_exploded[4] = $commune;
                                 break;
                             case 'igh':
                                 if($resource_exploded[3] == '1') $resource_exploded[3] = $commissions;
                                 if($resource_exploded[4] == '1') $resource_exploded[4] = $groupements;
-                                if($resource_exploded[5] == '1') $resource_exploded[5] = $utilisateur['NUMINSEE_COMMUNE'];
+                                if($resource_exploded[5] == '1') $resource_exploded[5] = $commune;
                                 break;
                             case 'eic':
                                 if($resource_exploded[2] == '1') $resource_exploded[2] = $groupements;
-                                if($resource_exploded[3] == '1') $resource_exploded[3] = $utilisateur['NUMINSEE_COMMUNE'];
+                                if($resource_exploded[3] == '1') $resource_exploded[3] = $commune;
                                 break;
                             case 'camp':
                                 if($resource_exploded[2] == '1') $resource_exploded[2] = $groupements;
-                                if($resource_exploded[3] == '1') $resource_exploded[3] = $utilisateur['NUMINSEE_COMMUNE'];
+                                if($resource_exploded[3] == '1') $resource_exploded[3] = $commune;
                                 break;
                             case 'temp':
                                 if($resource_exploded[2] == '1') $resource_exploded[2] = $groupements;
-                                if($resource_exploded[3] == '1') $resource_exploded[3] = $utilisateur['NUMINSEE_COMMUNE'];
+                                if($resource_exploded[3] == '1') $resource_exploded[3] = $commune;
                                 break;
                             case 'iop':
                                 if($resource_exploded[2] == '1') $resource_exploded[2] = $groupements;
-                                if($resource_exploded[3] == '1') $resource_exploded[3] = $utilisateur['NUMINSEE_COMMUNE'];
+                                if($resource_exploded[3] == '1') $resource_exploded[3] = $commune;
                                 break;
                             case 'zone':
                                 if($resource_exploded[3] == '1') $resource_exploded[3] = $groupements;
-                                if($resource_exploded[4] == '1') $resource_exploded[4] = $utilisateur['NUMINSEE_COMMUNE'];
+                                if($resource_exploded[4] == '1') $resource_exploded[4] = $commune;
                                 break;
                         }
 

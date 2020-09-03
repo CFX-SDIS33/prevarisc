@@ -39,6 +39,8 @@ class EtablissementController extends Zend_Controller_Action
         $this->view->etablissement = $etablissement;
 
         $this->view->key_ign = getenv('PREVARISC_PLUGIN_IGNKEY');
+	$this->view->default_lon = getenv('PREVARISC_CARTO_DEFAULT_LON') ? : "-0.5925350000824815";
+        $this->view->default_lat = getenv('PREVARISC_CARTO_DEFAULT_LAT') ? : "44.854857004962966";
 
         $service_genre = new Service_Genre;
         $service_statut = new Service_Statut;

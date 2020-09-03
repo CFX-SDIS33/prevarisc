@@ -46,8 +46,9 @@
         // Création du conteneur
         public function buildContainer($size)
         {
-            echo '<script type="text/javascript" src="//api.ign.fr/geoportail/api/js/1.3/GeoportalExtended.js"></script>';
-            echo '<div id="geo_container" style="height: ' . $size['height'] . '"></div>';
+        	echo '<script type="text/javascript" src="/sdk_geoportail/GpSDK3D.js"></script>';
+        	echo '<script type="text/javascript" src="/sdk_geoportail/autoconf-https.json"></script>';
+        	echo '<div id="geo_container" style="height: ' . $size['height'] . '"></div>';
         }
 
         // Chargements des couches

@@ -138,8 +138,21 @@ class CalendrierDesCommissionsController extends Zend_Controller_Action
 
             if(count($listeEtab) > 0)
             {
-            	//on recupere la liste des infos des établissement
-                $etablissementInfos = $service_etablissement->get($listeEtab[0]['ID_ETABLISSEMENT']);
+            	
+            	// Pour chaque établissement lié au dossier
+            	foreach($listeEtab as $indiceEtab => $etab)
+            	{
+            		// On récupère la liste des infos de l'établissement
+            		$etablissementInfos = $service_etablissement->get($listeEtab[$indiceEtab]['ID_ETABLISSEMENT']);
+            		
+            		// On s'arrête sur le 1er établissement pour lequel on trouve une adresse
+            		if (isset($etablissementInfos['adresses'][0])) {
+            			break;
+            		}
+            	}
+            	
+//             	//on recupere la liste des infos des établissement
+//                 $etablissementInfos = $service_etablissement->get($listeEtab[0]['ID_ETABLISSEMENT']);
                 
                 if (!empty($etablissementInfos)) {
                 	$listeDossiersNonAffect[$indiceDossierNonAffecte]['infosEtab'] = $etablissementInfos;
@@ -297,7 +310,19 @@ class CalendrierDesCommissionsController extends Zend_Controller_Action
 			//on recupere la liste des infos des établissement
 			if(count($listeEtab) > 0)
 			{
-				$etablissementInfos = $service_etablissement->get($listeEtab[0]['ID_ETABLISSEMENT']);
+				// Pour chaque établissement lié au dossier
+				foreach($listeEtab as $indiceEtab => $etab)
+				{
+					// On récupère la liste des infos de l'établissement
+					if(isset($listeEtab[$indiceEtab]['ID_ETABLISSEMENT'])){
+						$etablissementInfos = $service_etablissement->get($listeEtab[$indiceEtab]['ID_ETABLISSEMENT']);
+					}
+					
+					// On s'arrête sur le 1er établissement pour lequel on trouve une adresse
+					if (isset($etablissementInfos['adresses'][0])) {
+						break;
+					}
+				}
 				$listeDossiersAffect[$val]['infosEtab'] = $etablissementInfos;
 				$listeDocUrba = $dbDocUrba->getDossierDocUrba($ue['ID_DOSSIER']);
 				$listeDossiersAffect[$val]['listeDocUrba'] = $listeDocUrba;
@@ -974,7 +999,19 @@ class CalendrierDesCommissionsController extends Zend_Controller_Action
 				//on recupere la liste des infos des établissement
 				if(count($listeEtab) > 0)
 				{
-					$etablissementInfos = $service_etablissement->get($listeEtab[0]['ID_ETABLISSEMENT']);
+					// Pour chaque établissement lié au dossier
+					foreach($listeEtab as $indiceEtab => $etab)
+					{
+						// On récupère la liste des infos de l'établissement
+						if(isset($listeEtab[$indiceEtab]['ID_ETABLISSEMENT'])){
+							$etablissementInfos = $service_etablissement->get($listeEtab[$indiceEtab]['ID_ETABLISSEMENT']);
+						}
+						
+						// On s'arrête sur le 1er établissement pour lequel on trouve une adresse
+						if (isset($etablissementInfos['adresses'][0])) {
+							break;
+						}
+					}
 					$listeDossiers[$val]['infosEtab'] = $etablissementInfos;
 					$listeDocUrba = $dbDocUrba->getDossierDocUrba($ue['ID_DOSSIER']);
 					$listeDossiers[$val]['listeDocUrba'] = $listeDocUrba;
@@ -1091,9 +1128,23 @@ class CalendrierDesCommissionsController extends Zend_Controller_Action
                     
                     //On recupere la liste des établissements qui concernent le dossier
                     $listeEtab = $dbDossier->getEtablissementDossierGenConvoc($ue['ID_DOSSIER']);
+                    
                     //on recupere la liste des infos des établissement
                     if (count($listeEtab) > 0) {
-                        $etablissementInfos = $service_etablissement->get($listeEtab[0]['ID_ETABLISSEMENT']);
+                    	// Pour chaque établissement lié au dossier
+                    	foreach($listeEtab as $indiceEtab => $etab)
+                    	{
+                    		// On récupère la liste des infos de l'établissement
+                    		if(isset($listeEtab[$indiceEtab]['ID_ETABLISSEMENT'])){
+                    			$etablissementInfos = $service_etablissement->get($listeEtab[$indiceEtab]['ID_ETABLISSEMENT']);
+                    		}
+                    		
+                    		// On s'arrête sur le 1er établissement pour lequel on trouve une adresse
+                    		if (isset($etablissementInfos['adresses'][0])) {
+                    			break;
+                    		}
+                    	}
+                    	
                         $listeDossiers[$val]['infosEtab'] = $etablissementInfos;
 
                         $listeDocUrba = $dbDocUrba->getDossierDocUrba($ue['ID_DOSSIER']);
@@ -1195,10 +1246,21 @@ class CalendrierDesCommissionsController extends Zend_Controller_Action
 			$listeEtab = $dbDossier->getEtablissementDossierGenConvoc($ue['ID_DOSSIER']);
 
 			//on recupere la liste des infos des établissement
-			if(isset($listeEtab[0]['ID_ETABLISSEMENT'])){
-				$etablissementInfos = $service_etablissement->get($listeEtab[0]['ID_ETABLISSEMENT']);
-				$listeDossiers[$val]['infosEtab'] = $etablissementInfos;
+			// Pour chaque établissement lié au dossier
+			foreach($listeEtab as $indiceEtab => $etab)
+			{
+				// On récupère la liste des infos de l'établissement
+				if(isset($listeEtab[$indiceEtab]['ID_ETABLISSEMENT'])){
+					$etablissementInfos = $service_etablissement->get($listeEtab[$indiceEtab]['ID_ETABLISSEMENT']);
+				}
+				
+				// On s'arrête sur le 1er établissement pour lequel on trouve une adresse
+				if (isset($etablissementInfos['adresses'][0])) {
+					break;
+				}
 			}
+			
+			$listeDossiers[$val]['infosEtab'] = $etablissementInfos;
 
 			$listeDocUrba = $dbDocUrba->getDossierDocUrba($ue['ID_DOSSIER']);
 			$listeDossiers[$val]['listeDocUrba'] = $listeDocUrba;
@@ -1250,11 +1312,24 @@ class CalendrierDesCommissionsController extends Zend_Controller_Action
 		{
 			//On recupere la liste des établissements qui concernent le dossier
 			$listeEtab = $dbDossier->getEtablissementDossierGenConvoc($ue['ID_DOSSIER']);
+			
 			//on recupere la liste des infos des établissement
-			if(isset($listeEtab[0]['ID_ETABLISSEMENT'])){
-				$etablissementInfos = $service_etablissement->get($listeEtab[0]['ID_ETABLISSEMENT']);
-				$listeDossiers[$val]['infosEtab'] = $etablissementInfos;
+			// Pour chaque établissement lié au dossier
+			foreach($listeEtab as $indiceEtab => $etab)
+			{
+				// On récupère la liste des infos de l'établissement
+				if(isset($listeEtab[$indiceEtab]['ID_ETABLISSEMENT'])){
+					$etablissementInfos = $service_etablissement->get($listeEtab[$indiceEtab]['ID_ETABLISSEMENT']);
+				}
+				
+				// On s'arrête sur le 1er établissement pour lequel on trouve une adresse
+				if (isset($etablissementInfos['adresses'][0])) {
+					break;
+				}
 			}
+			
+			$listeDossiers[$val]['infosEtab'] = $etablissementInfos;
+			
 			$listeDocUrba = $dbDocUrba->getDossierDocUrba($ue['ID_DOSSIER']);
 			$listeDossiers[$val]['listeDocUrba'] = $listeDocUrba;
 		}

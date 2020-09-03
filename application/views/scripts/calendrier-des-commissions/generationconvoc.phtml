@@ -34,7 +34,7 @@ foreach($this->informationsMembre as $val => $membre){
 			if( count($dossierInfos['infosEtab']['adresses']) > 0 && count($commune) > 0){
 				if($dossierInfos['infosEtab']['adresses'][0]['LIBELLE_COMMUNE'] == $commune[0]){
 					//ICI ON DOIT VERIFIER LES DROITS DES MEMBRES AVANT D'AJOUTER LE DOSSIER
-					if($membre['categories'][ $dossierInfos['infosEtab']['informations']['ID_CATEGORIE']]['ID_COMMISSIONMEMBRE'] && $membre['types'][ $dossierInfos['infosEtab']['informations']['ID_TYPEACTIVITE']]['ID_COMMISSIONMEMBRE'] && $membre['dossiertypes'][ $dossierInfos['TYPE_DOSSIER']]['ID_COMMISSIONMEMBRE'])
+					if((($dossierInfos['infosEtab']['informations']['ID_GENRE'] != 5 && $membre['categories'][ $dossierInfos['infosEtab']['informations']['ID_CATEGORIE']]['ID_COMMISSIONMEMBRE'] && $membre['types'][ $dossierInfos['infosEtab']['informations']['ID_TYPEACTIVITE']]['ID_COMMISSIONMEMBRE']) || ($dossierInfos['infosEtab']['informations']['ID_GENRE'] == 5 && $membre['classes'][ $dossierInfos['infosEtab']['informations']['ID_CLASSE']]['ID_COMMISSIONMEMBRE'])) && $membre['dossiertypes'][ $dossierInfos['TYPE_DOSSIER']]['ID_COMMISSIONMEMBRE'])
 					{
                                             $cptConcerne ++;
                                         }
@@ -90,7 +90,7 @@ foreach($this->informationsMembre as $val => $membre){
 						//echo $dossierInfos['infosEtab']['adresses'][0]['LIBELLE_COMMUNE']." - ".$commune[0];
 						if($dossierInfos['infosEtab']['adresses'][0]['LIBELLE_COMMUNE'] == $commune[0]){
 							//ICI ON DOIT VERIFIER LES DROITS DES MEMBRES AVANT D'AJOUTER LE DOSSIER
-							if($membre['categories'][ $dossierInfos['infosEtab']['informations']['ID_CATEGORIE']]['ID_COMMISSIONMEMBRE'] && $membre['types'][ $dossierInfos['infosEtab']['informations']['ID_TYPEACTIVITE']]['ID_COMMISSIONMEMBRE'] && $membre['dossiertypes'][ $dossierInfos['TYPE_DOSSIER']]['ID_COMMISSIONMEMBRE'])
+							if((($dossierInfos['infosEtab']['informations']['ID_GENRE'] != 5 && $membre['categories'][ $dossierInfos['infosEtab']['informations']['ID_CATEGORIE']]['ID_COMMISSIONMEMBRE'] && $membre['types'][ $dossierInfos['infosEtab']['informations']['ID_TYPEACTIVITE']]['ID_COMMISSIONMEMBRE']) || ($dossierInfos['infosEtab']['informations']['ID_GENRE'] == 5 && $membre['classes'][ $dossierInfos['infosEtab']['informations']['ID_CLASSE']]['ID_COMMISSIONMEMBRE'])) && $membre['dossiertypes'][ $dossierInfos['TYPE_DOSSIER']]['ID_COMMISSIONMEMBRE'])
 							{
                                                             if(isset($dossierInfos["HEURE_DEB_AFFECT"])){
                                                                 $heureDebutTab = explode(":",$dossierInfos["HEURE_DEB_AFFECT"]);
@@ -112,17 +112,17 @@ foreach($this->informationsMembre as $val => $membre){
 						//echo $dossierInfos['infosEtab']['adresses'][0]['LIBELLE_COMMUNE']." - ".$commune[0];
 						if($dossierInfos['infosEtab']['adresses'][0]['LIBELLE_COMMUNE'] == $commune[0]){
 							//ICI ON DOIT VERIFIER LES DROITS DES MEMBRES AVANT D'AJOUTER LE DOSSIER
-							if($membre['categories'][ $dossierInfos['infosEtab']['informations']['ID_CATEGORIE']]['ID_COMMISSIONMEMBRE'] && $membre['types'][ $dossierInfos['infosEtab']['informations']['ID_TYPEACTIVITE']]['ID_COMMISSIONMEMBRE'] && $membre['dossiertypes'][ $dossierInfos['TYPE_DOSSIER']]['ID_COMMISSIONMEMBRE'])
+							if((($dossierInfos['infosEtab']['informations']['ID_GENRE'] != 5 && $membre['categories'][ $dossierInfos['infosEtab']['informations']['ID_CATEGORIE']]['ID_COMMISSIONMEMBRE'] && $membre['types'][ $dossierInfos['infosEtab']['informations']['ID_TYPEACTIVITE']]['ID_COMMISSIONMEMBRE']) || ($dossierInfos['infosEtab']['informations']['ID_GENRE'] == 5 && $membre['classes'][ $dossierInfos['infosEtab']['informations']['ID_CLASSE']]['ID_COMMISSIONMEMBRE'])) && $membre['dossiertypes'][ $dossierInfos['TYPE_DOSSIER']]['ID_COMMISSIONMEMBRE'])
 							{
-                                                            retrieveInfoDossier($infosDoss, $dossierInfos, $dateComm->get(Zend_Date::DAY." ".Zend_Date::MONTH_NAME." ".Zend_Date::YEAR));
-                                                            $villeODF->infosDoss->merge();
-                                                        }else{
+                            	retrieveInfoDossier($infosDoss, $dossierInfos, $dateComm->get(Zend_Date::DAY." ".Zend_Date::MONTH_NAME." ".Zend_Date::YEAR));
+                                $villeODF->infosDoss->merge();
+                            }else{
 								//cas membre n'a pas les droits
 							}
 						}
 					}
 				}
-                                $villeODF->merge();
+                $villeODF->merge();
 			}
 			$odf->mergeSegment($villeODF);
 

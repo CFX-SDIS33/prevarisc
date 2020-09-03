@@ -432,7 +432,7 @@
 </div>
 
 <!-- Boite de construction d'adresse-->
-<form id="adresse-modal" class="modal hide adresse fase" action='#' method='post'>
+<form id="adresse-modal" class="modal modal-adresse hide adresse fase" action='#' method='post'>
 
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -474,8 +474,9 @@
 
             <dt>Géolocalisation</dt>
             <dd>
-                <?php if($this->key_ign != null) : ?><button id="geolocme" class='btn btn-small'><i class="icon-map-marker"></i> Géolocaliser cette adresse (Geoportail)</button><?php endif ?>
-                <button id="geolocme_nominatim" class='btn btn-small'><i class="icon-map-marker"></i> Géolocaliser cette adresse (Nominatim)</button>
+		<?php if($this->key_ign != null) : ?><button id="geolocme" class='btn btn-small'><i class="icon-map-marker"></i> Géolocaliser cette adresse (Geoportail)</button><?php endif ?>
+                <?php if($this->geoconcept_url != null) : ?><button id="geolocme-geoconcept" class='btn btn-small'><i class="icon-map-marker"></i> Géolocaliser cette adresse (Geoconcept)</button><?php endif ?>
+                <button id="geolocme_nominatim" class='btn btn-small'><i class="icon-map-marker"></i> Géolocaliser cette adresse (Nominatim)</button>	
                 <br/>
                 <small>Résultat : <span class='result'>Inconnu</span></small>
             </dd>
@@ -490,9 +491,29 @@
                  <input id="addressLatitude" type='text' name='lat' />
             </dd>
         </dl>
-        <?php if($this->key_ign != null): ?>
-            <script type="text/javascript" src="//api.ign.fr/geoportail/api/js/2.1.2/GeoportalExtended.js"></script>
-            <div id='geoportail-container' style="height: 400px"></div>
+	<?php if($this->key_ign != null): ?>
+            <div id="geoportail-container" style="height: 400px;"></div>
+            <!-- SDK Géoportail -->
+            <script src="/sdk_geoportail/GpSDK3D.js"></script>
+            <link rel="stylesheet" href="/sdk_geoportail/GpSDK3D.css" />
+            <!-- FIN SDK -->
+            <script type="text/javascript" src="/js/main.js"></script>
+            <!-- Déplacement du bouton FullScreen (sinon supperposé avec le gestionnaire de couches) -->
+            <style>
+            .ol-full-screen {right:9px; top:49px}
+            </style>
+        <?php endif ?>
+        
+        <?php if($this->geoconcept_url != null) : ?>
+            <div id='geoconcept-container' style="height: 400px; width: 100%"></div>
+            <script type="text/javascript" src="/js/geoconcept/OpenLayers.js"></script>
+            <script type="text/javascript" src="/js/geoconcept/proj4js.js"></script>
+            <script type="text/javascript" src="/js/geoconcept/htc-lite.js"></script>
+            <?php if ($projection = getenv('PREVARISC_PLUGIN_GEOCONCEPT_PROJECTION')): ?>
+            <script type="text/javascript" src="/js/geoconcept/defs/<?php echo $projection ?>.js"></script>
+            <?php endif ?>
+            <script type="text/javascript" src="/js/geoconcept/geoconcept.js"></script>
+            <link rel="stylesheet" href="/css/geoconcept/htc.css"/>
         <?php endif ?>
     </div>
 
@@ -921,42 +942,126 @@
             $("#adresse-modal input[name='numero'], #adresse-modal input[name='complement']").val("").attr("disabled", true).blur();
         });
 
-        <?php if($this->key_ign != null): ?>
-            viewer = initViewer(
-                "geoportail-container", 
-                "<?php echo $this->key_ign ?>", 
-                [{lon: -1.638023, lat: 48.134198999999995, description: ""}], 
+	$('#adresse-modal').on('shown.bs.modal', function () {
+            if($('#adresse-modal .modal-body').scrollTop() !== 0) {
+                $('#adresse-modal .modal-body').scrollTop(0);
+            }
+            $('#adresse-modal input').val('');
+            $("#adresse-modal input[name='voie_ac'], #adresse-modal input[name='numero'], #adresse-modal input[name='complement']").val("").attr("disabled", true).blur();
+            $("span.result").text("Inconnu");            
+            $('#geoportail-container').css('visibility', 'hidden');
+
+            // Si une carto est déjà présente, on n'en charge pas une autre
+            if($('#geoportail-container .ol-viewport').length == 0) { 
+                // On empêche le clic sur la géolocalisation jusqu'à ce que la carto soit chargée
+                $('#adresse-modal #geolocme').attr('disabled', true);
+                $('#adresse-modal #geolocme_nominatim').attr('disabled', true);
+                /***** Carte IGN *****/
+                <?php if($this->key_ign != null): ?>
+
+                    <?php
+                        $public_dir = $_SERVER['DOCUMENT_ROOT'];
+                        $autoconf_path = getenv('PREVARISC_IGN_AUTOCONF');
+                        $autoconf_path = file_exists($public_dir.$autoconf_path) ? $autoconf_path : "";
+                    ?>
+
+		    viewer = initViewer('geoportail-container',
+                                        '<?php echo $this->key_ign ?>',
+                                        [<?php echo $this->default_lon ?>, <?php echo $this->default_lat ?>],
+                                        '<b>Centre par défaut</b>',
+                                        '<?php echo $autoconf_path ?>');
+
+                    viewer.listen('mapLoaded', afterInitMap);
+                    //viewer.listen('located', afterPositionLocated);
+                    viewer.listen('azimuthChanged', onRotation);
+                    function afterInitMap () {
+                        // Ajout du bouton FullScreen sur la carte
+                        var fsControl = new ol.control.FullScreen({});
+                        viewer.getLibMap().addControl(fsControl);
+                        // Ajout des couches utilisateur
+                        viewer = addUserLayers(viewer,
+                                               '<?php echo $this->key_ign ?>',
+                                               <?php echo json_encode($this->couches_cartographiques) ?>);
+                        nbCouches = viewer.getLibMap().getLayers().getLength();
+                        // On enlève le marker par défaut, les outils de mesures, et le reset d'orientation
+                        $('.ol-overlay-container').css('display', 'none');
+                        $('div[id^=GPtoolbox-measure-main-]').css('display', 'none');
+                        $('.ol-rotate').css('display', 'none');
+                        $('#adresse-modal #geolocme').removeAttr('disabled');
+                        $('#adresse-modal #geolocme_nominatim').removeAttr('disabled');
+                    };
+                    /*function afterPositionLocated () {
+                        $("span.result").text("Géolocalisée IGN");
+                        $('#geoportail-container').css('visibility', 'visible');
+                        // Changement des coordonnées et du marker 
+                        lonlat = updateCoordinates([viewer.getCenter().x, viewer.getCenter().y], 'EPSG:3857', 'EPSG:4326');
+                        putMarkerAt(viewer.getLibMap(), lonlat, nbCouches);
+                    };*/
+                    function onRotation () {
+                        viewer.getAzimuth() === 0 ? $('.ol-rotate').css('display', 'none') : $('.ol-rotate').css('display', 'block');
+                    };
+                    viewer.getLibMap().on('singleclick', function(evt) {
+                        lonlat = updateCoordinates(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+                        putMarkerAt(viewer.getLibMap(), lonlat, nbCouches);
+                    });
+                    $('#adresse-modal #geolocme').click(function(e) {
+                        e.preventDefault();
+                        var adresse = "";
+                        var numero = $("input[name='numero']").val().trim();
+                        var voie = $("input[name='voie_ac']").val().trim();
+                        var codepostal = $("input[name='code_postal']").val();
+                        var commune = $("input[name='commune_ac']").val().replace(/\(.*\)/g, '');
+                        if (!commune) {
+                            $("span.result").text("Pas de commune renseignée");
+                            return false;
+                        }
+                        if (!voie) {
+                            $("span.result").text("Pas de voie renseignée");
+                            return false;
+                        }
+                        if (numero) {
+                            adresse += numero + ", ";
+                        }
+                        adresse += voie + ", " + codepostal +  ", " + commune;
+                        $("span.result").text("Géolocalisation en cours...");
+                        /*viewer.setCenter({
+                            location : adresse,
+                            locationType : ['StreetAddress'],
+                            projection : "EPSG:4326"
+                        });*/
+                        geocodeWithJsAutoconf('<?php echo $this->key_ign ?>',
+                                              adresse,
+                                              'StreetAddress',
+                                              'EPSG:4326',
+                                              viewer,
+                                              nbCouches);
+                        return false;
+                    });
+                <?php endif ?>
+            }
+        });
+        
+        <?php if( $this->geoconcept_url != null): ?>
+                
+            <?php if ($token = getenv('PREVARISC_PLUGIN_GEOCONCEPT_TOKEN') && $app_id = getenv('PREVARISC_PLUGIN_GEOCONCEPT_APP_ID')): ?>
+                initGeoConceptKey('<?php echo $app_id ?>', '<?php echo $token ?>');
+            <?php endif ?>
+                                
+            var map = initGeoConceptViewer('geoconcept-container', 
+                "<?php echo $this->geoconcept_url ?>",
+                "<?php echo getenv('PREVARISC_PLUGIN_GEOCONCEPT_LAYER') ?>",
+                [{lat: <?php echo $this->default_lat ?>,lon: <?php echo $this->default_lon ?>, description: ""}],
                 <?php echo json_encode($this->couches_cartographiques) ?>,
                 function() {
                     
                     // removes the marker
-                    var vectorLayers = viewer.getViewer().getMap().getLayersByClass('OpenLayers.Layer.Vector');
+                    var vectorLayers = map.getLayersByClass('OpenLayers.Layer.Vector');
                     if (vectorLayers !== null && vectorLayers.length > 0) {
                         var vectorLayer = vectorLayers[0];
-                        if (vectorLayer.features !== null && vectorLayer.features.length > 0) {
-                            vectorLayer.features[0].destroy();
+                        for(var j = 0 ; j < vectorLayer.features.length ; j++) {
+                            vectorLayer.features[j].destroy();
                         }
                     }
-
-                    viewer.getViewer().getMap().events.register("moveend", viewer.getViewer().getMap(), function(e) {
-                        if (geolocalizing) {
-                            geolocalizing = false;
-                            var map = viewer.getViewer().getMap();
-                            var center = map.getCenter().transform(map.getProjection(), 'EPSG:4326');
-                            if(center && center.lon && center.lat) {
-                                $("span.result").text("Géolocalisée IGN");
-                                $("input[name='lon']").val(center.lon);
-                                $("input[name='lat']").val(center.lat);
-                                putMarkerAt(map, map.getCenter(), map.getProjection());
-                            }
-                            else {
-                                $("span.result").text("Introuvable");
-                                $("input[name='lon']").val(0);
-                                $("input[name='lat']").val(0);
-                            }
-                        }
-                    });
-
                     OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
                         defaultHandlerOptions:{
                             'single': true,
@@ -965,7 +1070,6 @@
                             'stopSingle': false,
                             'stopDouble': false
                         },
-
                         /**
                          * Constructor
                          */
@@ -975,35 +1079,31 @@
                             this.handler= new OpenLayers.Handler.Click(
                                 this, {'click': this.trigger}, this.handlerOptions);
                         },
-
                         /**
                          * APIMethod: trigger
                          */
                         trigger: function(e) {
-                            var lonlat = this.map.getLonLatFromViewPortPx(e.xy).transform(
-                                this.map.getProjection(), OpenLayers.Projection.CRS84
+                            var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(
+                                map.getProjection(), new OpenLayers.Projection("EPSG:4326")
                             );
-
                             $("span.result").text("Manuel par clic sur la carte");
                             $("input[name='lon']").val(lonlat.lon);
                             $("input[name='lat']").val(lonlat.lat);
-
                             // update map
-                            putMarkerAt(this.map, this.map.getLonLatFromViewPortPx(e.xy), this.map.getProjection());
+                            geoConceptPutMarkerAt(map, map.getLonLatFromViewPortPx(e.xy));
                         }
                     });
-
+                    
                     // création et insertion du nouveau contrôleur
-                    var monClic = new OpenLayers.Control.Click({
+                    map.addControl(new OpenLayers.Control.Click({
                         autoActivate:true
-                    });
-                    viewer.getViewer().getMap().addControl(monClic);
+                    }));
                 }
             );
-
-            geolocalizing = false;
-            $('#adresse-modal #geolocme').click(function(e) {
+    
+            $('#adresse-modal #geolocme-geoconcept').click(function(e) {
                 e.preventDefault();
+                var geocoderUrl = "<?php echo getenv('PREVARISC_PLUGIN_GEOCONCEPT_GEOCODER') ?>";
                 var adresse = "";
                 var numero = $("input[name='numero']").val().trim();
                 var voie = $("input[name='voie_ac']").val().trim();
@@ -1020,22 +1120,23 @@
                 if (numero) {
                     adresse += numero + ", ";
                 }
-                adresse += voie + ", " + codepostal +  " " + commune;
+                adresse += voie;
                 $("span.result").text("Géolocalisation en cours...");
-
-                geolocalizing = true;
-                console.log('Geolocalising : '+adresse);
-                viewer.setCenterAtLocation({
-                    address: adresse
+                geoConceptGeocode(geocoderUrl, map, adresse, codepostal, commune, function(result) {
+                    if (result) {
+                        $("span.result").text("Géolocalisée Geoconcept");
+                        $("input[name='lon']").val(result.x);
+                        $("input[name='lat']").val(result.y);
+                    }
+                    else {
+                        $("span.result").text("Introuvable");
+                        $("input[name='lon']").val(0);
+                        $("input[name='lat']").val(0);
+                    }
                 });
-
                 return false;
             });
-
-            
-
         <?php endif ?>
-
         // Géolocalisation de l'adresse
         $('#adresse-modal #geolocme_nominatim').click(function() {
             element = $(this);
@@ -1067,6 +1168,12 @@
                             putMarkerAt(map, lonlat, map.getProjection());
                             viewer.setCenter(parseFloat(geolocations[0].lon), parseFloat(geolocations[0].lat));
                             viewer.setZoom(17);
+                        <?php elseif ($this->geoconcept_url != null): ?>
+                            var lonlat = new OpenLayers.LonLat(geolocations[0].lon, geolocations[0].lat);
+                            lonlat = lonlat.transform(new OpenLayers.Projection('EPSG:4326'), new OpenLayers.Projection(map.getProjection()));
+                            map.moveTo(lonlat, 8);
+                            geoConceptPutMarkerAt(map, lonlat);
+                            map.updateSize();
                         <?php endif ?>
                     }
                     else {
@@ -1079,9 +1186,8 @@
                     element.text("Serveur de géolocalisation introuvable").attr('disabled', true);
                 }
             });
-
             return false;
-        });
+        });	
 
     });
 </script>
