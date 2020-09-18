@@ -11,3 +11,6 @@ vendor
 *.phar
 composer.lock
 cache
+/.metadata/
+/.settings/
+/.gitignore

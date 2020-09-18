@@ -8,11 +8,7 @@ if (!function_exists('addChamp')) {
         	}
         	$odf->setVars($nomOdf,$variable, true,'UTF8');
     	} catch (Exception $e) {
-    		$this->_helper->flashMessenger(array(
-    				'context' => 'error',
-    				'title' => 'Erreur lors de l\'ajout de la valeur de la balise ' . $nomOdf,
-    				'message' => $e->getMessage()
-    		));
+
     	}
     }
 }

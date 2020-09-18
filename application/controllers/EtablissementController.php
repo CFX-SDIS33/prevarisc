@@ -39,7 +39,7 @@ class EtablissementController extends Zend_Controller_Action
         $this->view->etablissement = $etablissement;
 
         $this->view->key_ign = getenv('PREVARISC_PLUGIN_IGNKEY');
-	$this->view->default_lon = getenv('PREVARISC_CARTO_DEFAULT_LON') ? : "-0.5925350000824815";
+		$this->view->default_lon = getenv('PREVARISC_CARTO_DEFAULT_LON') ? : "-0.5925350000824815";
         $this->view->default_lat = getenv('PREVARISC_CARTO_DEFAULT_LAT') ? : "44.854857004962966";
 
         $service_genre = new Service_Genre;
@@ -67,7 +67,6 @@ class EtablissementController extends Zend_Controller_Action
         $this->view->DB_classement = $service_classement->getAll();
         
         $this->view->couches_cartographiques = $service_carto->getAll();
-        $this->view->key_ign = getenv('PREVARISC_PLUGIN_IGNKEY');
 
         $this->view->add = false;
 
@@ -120,6 +119,8 @@ class EtablissementController extends Zend_Controller_Action
         $this->view->add = true;
         
         $this->view->key_ign = getenv('PREVARISC_PLUGIN_IGNKEY');
+        $this->view->default_lon = getenv('PREVARISC_CARTO_DEFAULT_LON') ? : "-0.5925350000824815";
+        $this->view->default_lat = getenv('PREVARISC_CARTO_DEFAULT_LAT') ? : "44.854857004962966";
         $this->view->couches_cartographiques = $service_carto->getAll();
 
         $cache = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getResource('cache');
