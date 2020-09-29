@@ -16,7 +16,11 @@
             <dd>
                 <p>
                     <?php foreach($this->groupes as $groupe) : ?>
-                    <input type="checkbox" name="conf[]" value="<?php echo $groupe["ID_GROUPE"] ?>" checked="checked" /><?php echo $groupe["LIBELLE_GROUPE"] ?><br/>
+                    	<?php if($groupe["ID_GROUPE"] == "1" ) : ?>
+                    		<input type="checkbox" name="conf[]" value="<?php echo $groupe["ID_GROUPE"] ?>" checked="checked" /><?php echo $groupe["LIBELLE_GROUPE"] ?><br/>
+                    	<?php else : ?>
+                    		<input type="checkbox" name="conf[]" value="<?php echo $groupe["ID_GROUPE"] ?>" /><?php echo $groupe["LIBELLE_GROUPE"] ?><br/>
+                    	<?php endif ?>
                     <?php endforeach ?>
                 </p>
             </dd>
