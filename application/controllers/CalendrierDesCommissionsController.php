@@ -371,7 +371,11 @@ class CalendrierDesCommissionsController extends Zend_Controller_Action
 			$DB_prev = new Model_DbTable_DossierPreventionniste;
 			$preventionnistes = $DB_prev->getPrevDossier( $dossierAffect['ID_DOSSIER'] );
             if(count($preventionnistes) > 0){
-				$affichage .= " (".$preventionnistes[0]['NOM_UTILISATEURINFORMATIONS']." ".$preventionnistes[0]['PRENOM_UTILISATEURINFORMATIONS'].")";
+            	if(count($preventionnistes) > 1){
+            		$affichage .= " (".$preventionnistes[0]['NOM_UTILISATEURINFORMATIONS1']." ".$preventionnistes[0]['PRENOM_UTILISATEURINFORMATIONS1'].", ".$preventionnistes[0]['NOM_UTILISATEURINFORMATIONS2']." ".$preventionnistes[0]['PRENOM_UTILISATEURINFORMATIONS2'].")";
+            	} else {
+            		$affichage .= " (".$preventionnistes[0]['NOM_UTILISATEURINFORMATIONS']." ".$preventionnistes[0]['PRENOM_UTILISATEURINFORMATIONS'].")";
+            	}
 			}
 
 			if($dossierAffect['VERROU_DOSSIER'] == 0){
