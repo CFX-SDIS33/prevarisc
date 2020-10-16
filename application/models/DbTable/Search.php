@@ -117,9 +117,12 @@
                          ->joinLeft("dossierdocurba", "d.ID_DOSSIER = dossierdocurba.ID_DOSSIER", "NUM_DOCURBA")
                          ->joinLeft(array("e" => "etablissementdossier"), "d.ID_DOSSIER = e.ID_DOSSIER", null)
                          ->joinLeft("avis", "d.AVIS_DOSSIER_COMMISSION = avis.ID_AVIS")
-                         ->joinLeft("dossierpreventionniste", "dossierpreventionniste.ID_DOSSIER = d.ID_DOSSIER", null)
-                         ->joinLeft("utilisateur", "utilisateur.ID_UTILISATEUR = dossierpreventionniste.ID_PREVENTIONNISTE", "ID_UTILISATEUR")
-                         ->joinLeft("utilisateurinformations","utilisateurinformations.ID_UTILISATEURINFORMATIONS = utilisateur.ID_UTILISATEURINFORMATIONS",array("PRENOM_UTILISATEURINFORMATIONS", "NOM_UTILISATEURINFORMATIONS"))
+                         ->joinLeft(array("dp1" => "dossierpreventionniste"),"dp1.ID_DOSSIER = d.ID_DOSSIER",null)
+                         ->joinLeft(array("u1" => "utilisateur"),"u1.ID_UTILISATEUR = dp1.ID_PREVENTIONNISTE",null)
+                         ->joinLeft(array("ui1" => "utilisateurinformations"),"ui1.ID_UTILISATEURINFORMATIONS = u1.ID_UTILISATEURINFORMATIONS",array("PRENOM_UTILISATEURINFORMATIONS1" => "PRENOM_UTILISATEURINFORMATIONS", "NOM_UTILISATEURINFORMATIONS1" => "NOM_UTILISATEURINFORMATIONS"))
+                         ->joinLeft(array("dp2" => "dossierpreventionniste"),"dp2.ID_DOSSIER = d.ID_DOSSIER and dp2.ID_PREVENTIONNISTE <> dp1.ID_PREVENTIONNISTE",null)
+                         ->joinLeft(array("u2" => "utilisateur"),"u2.ID_UTILISATEUR = dp2.ID_PREVENTIONNISTE",null)
+                         ->joinLeft(array("ui2" => "utilisateurinformations"),"ui2.ID_UTILISATEURINFORMATIONS = u2.ID_UTILISATEURINFORMATIONS",array("PRENOM_UTILISATEURINFORMATIONS2" => "PRENOM_UTILISATEURINFORMATIONS", "NOM_UTILISATEURINFORMATIONS2" => "NOM_UTILISATEURINFORMATIONS"))
                          ->joinLeft("etablissementinformations", "e.ID_ETABLISSEMENT = etablissementinformations.ID_ETABLISSEMENT AND etablissementinformations.DATE_ETABLISSEMENTINFORMATIONS =
                             IFNULL(
                                 (CASE
