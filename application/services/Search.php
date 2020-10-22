@@ -507,6 +507,10 @@ class Service_Search
                 ->joinLeft("adressecommune", "ea.NUMINSEE_COMMUNE = adressecommune.NUMINSEE_COMMUNE", array("CODEPOSTAL_COMMUNE","LIBELLE_COMMUNE"))
                 ->joinLeft("groupementcommune", "groupementcommune.NUMINSEE_COMMUNE = adressecommune.NUMINSEE_COMMUNE", null)
                 ->joinLeft("groupement", "groupement.ID_GROUPEMENT = groupementcommune.ID_GROUPEMENT", "LIBELLE_GROUPEMENT")
+                ->joinLeft("etablissementlie", "e.ID_ETABLISSEMENT = etablissementlie.ID_FILS_ETABLISSEMENT")
+                ->joinLeft(array("etablissementinformationspere" => "etablissementinformations"), "etablissementinformationspere.ID_ETABLISSEMENT = etablissementlie.ID_ETABLISSEMENT AND etablissementinformationspere.DATE_ETABLISSEMENTINFORMATIONS = ( SELECT MAX(etablissementinformations.DATE_ETABLISSEMENTINFORMATIONS) FROM etablissementinformations WHERE etablissementinformations.ID_ETABLISSEMENT = etablissementlie.ID_ETABLISSEMENT )", array("LIBELLE_ETABLISSEMENT_PERE" => "LIBELLE_ETABLISSEMENTINFORMATIONS"))
+                ->joinLeft(array("etablissementadressepere" => "etablissementadresse"), "etablissementadressepere.ID_ETABLISSEMENT = etablissementinformationspere.ID_ETABLISSEMENT", "ID_RUE AS ID_RUE_PERE")
+                ->joinLeft(array("adressecommunepere" => "adressecommune"), "etablissementadressepere.NUMINSEE_COMMUNE = adressecommunepere.NUMINSEE_COMMUNE", "LIBELLE_COMMUNE AS LIBELLE_COMMUNE_ADRESSE_PERE")
                 ->group("d.ID_DOSSIER")
                 ;
 

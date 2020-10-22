@@ -35,12 +35,19 @@
         <a href='/etablissement/index/id/<?php echo $this->ID_ETABLISSEMENT ?>' title='<?php echo htmlspecialchars($this->LIBELLE_ETABLISSEMENTINFORMATIONS , ENT_QUOTES) ?>'>
             <?php echo $this->LIBELLE_ETABLISSEMENTINFORMATIONS ?>
         </a>
+        <?php if($this->LIBELLE_ETABLISSEMENT_PERE != null) : ?>
+            <?php echo "[ ".$this->LIBELLE_ETABLISSEMENT_PERE." ]"  ?>
+        <?php endif ?>
         <br/>
         
         <?php /* Affichage du libellé de la commune */ ?>
         <small style='display: inline-block'>
             <strong>
-            <?php echo $this->LIBELLE_COMMUNE ?>
+            <?php if($this->LIBELLE_COMMUNE != null) : ?>
+            	<?php echo $this->LIBELLE_COMMUNE ?>
+            <?php else : ?>
+            	<?php echo $this->LIBELLE_COMMUNE_ADRESSE_PERE ?>
+            <?php endif ?>
             </strong>
         </small>
         <br />
@@ -103,10 +110,6 @@
         <span class='avis' style='background-color: #3a87ad'>Fait l'objet d'un échéancier de travaux</span>
         <?php endif ?>
     </td>
-
-
-
-
 
     <?php /* Dates du dossier */ ?>
     <td>
