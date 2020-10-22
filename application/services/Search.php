@@ -614,7 +614,7 @@ class Service_Search
             		
             		// cas par défaut
             	} else {
-            		$this->setCriteria($select, "LIBELLE_ETABLISSEMENTINFORMATIONS", $cleanLabel, false);
+            		$this->setCriteria($select, "ei.LIBELLE_ETABLISSEMENTINFORMATIONS", $cleanLabel, false);
             	}
             }
             
