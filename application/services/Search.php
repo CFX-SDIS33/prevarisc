@@ -494,7 +494,7 @@ class Service_Search
                 ->join("dossiertype", "dossiertype.ID_DOSSIERTYPE = dossiernatureliste.ID_DOSSIERTYPE", "LIBELLE_DOSSIERTYPE")
                 ->joinLeft(array("ed"=>"etablissementdossier"), "d.ID_DOSSIER = ed.ID_DOSSIER", null)
                 ->join(array("e"=>"etablissement"), "ed.ID_ETABLISSEMENT = e.ID_ETABLISSEMENT", "ID_ETABLISSEMENT AS ID_ETABLISSEMENT_DOSSIER")
-                ->join(array("ei" =>"etablissementinformations"), "e.ID_ETABLISSEMENT = ei.ID_ETABLISSEMENT AND ei.DATE_ETABLISSEMENTINFORMATIONS = ( SELECT MAX(etablissementinformations.DATE_ETABLISSEMENTINFORMATIONS) FROM etablissementinformations WHERE etablissementinformations.ID_ETABLISSEMENT = e.ID_ETABLISSEMENT )", array("LIBELLE_ETABLISSEMENTINFORMATIONS","ID_ETABLISSEMENT","ID_CATEGORIE"))
+                ->join(array("ei" =>"etablissementinformations"), "e.ID_ETABLISSEMENT = ei.ID_ETABLISSEMENT AND ei.DATE_ETABLISSEMENTINFORMATIONS = ( SELECT MAX(etablissementinformations.DATE_ETABLISSEMENTINFORMATIONS) FROM etablissementinformations WHERE etablissementinformations.ID_ETABLISSEMENT = e.ID_ETABLISSEMENT )", array("LIBELLE_ETABLISSEMENTINFORMATIONS","ID_CATEGORIE"))
                 ->joinLeft("type","type.ID_TYPE = ei.ID_TYPE",array("ID_TYPE","LIBELLE_TYPE"))
                 ->joinLeft("typeactivite", "ei.ID_TYPEACTIVITE = typeactivite.ID_TYPEACTIVITE", "LIBELLE_ACTIVITE")
                 ->joinLeft("genre","genre.ID_GENRE = ei.ID_GENRE","LIBELLE_GENRE")
