@@ -495,6 +495,7 @@ class SearchController extends Zend_Controller_Action
         				$criteresRecherche['avisDiffere'] = array_key_exists('avisDiffere', $parameters ) && count ( $parameters ['avisDiffere'] ) == 1 ? $parameters ['avisDiffere'] [0] == 'true' : null;
         				$criteresRecherche['commune'] = array_key_exists('commune', $parameters) && $parameters['commune'] != '' ? $parameters['commune'] : null;
         				$criteresRecherche['voie'] = array_key_exists('voie', $parameters) && $parameters['voie'] != '' ? $parameters['voie'] : null;
+        				$criteresRecherche['permis'] = array_key_exists('permis', $parameters) && $parameters['permis'] != '' ? $parameters['permis'] : null;
         				$criteresRecherche['courrier'] = array_key_exists('courrier', $parameters) && $parameters['courrier'] != '' ? $parameters['courrier'] : null;
         				$criteresRecherche['preventionniste'] = array_key_exists('preventionniste', $parameters) && $parameters['preventionniste'] != '' ? $parameters['preventionniste'] : null;
         				$criteresRecherche['dateCreationStart'] = array_key_exists('date-creation-start', $parameters) && $checkDateFormat($parameters['date-creation-start']) ? $parameters['date-creation-start'] : null;
@@ -660,6 +661,7 @@ class SearchController extends Zend_Controller_Action
         					$criteresRecherche['avisDiffere'] = array_key_exists('avisDiffere', $parameters ) && count ( $parameters ['avisDiffere'] ) == 1 ? $parameters ['avisDiffere'] [0] == 'true' : null;
         					$criteresRecherche['commune'] = array_key_exists('commune', $parameters) && $parameters['commune'] != '' ? $parameters['commune'] : null;
         					$criteresRecherche['voie'] = array_key_exists('voie', $parameters) && $parameters['voie'] != '' ? $parameters['voie'] : null;
+        					$criteresRecherche['permis'] = array_key_exists('permis', $parameters) && $parameters['permis'] != '' ? $parameters['permis'] : null;
         					$criteresRecherche['courrier'] = array_key_exists('courrier', $parameters) && $parameters['courrier'] != '' ? $parameters['courrier'] : null;
         					$criteresRecherche['preventionniste'] = array_key_exists('preventionniste', $parameters) && $parameters['preventionniste'] != '' ? $parameters['preventionniste'] : null;
         					$criteresRecherche['dateCreationStart'] = array_key_exists('date-creation-start', $parameters) && $checkDateFormat($parameters['date-creation-start']) ? $parameters['date-creation-start'] : null;

@@ -515,9 +515,9 @@ class Service_Search
                 ;
 
             // Critères : numéro de doc urba
-            if($num_doc_urba !== null) {
-               $select->having("NB_URBA like ?", "%$num_doc_urba%");
-            }
+//             if($num_doc_urba !== null) {
+//                $select->having("NB_URBA like ?", "%$num_doc_urba%");
+//             }
 
             // Critères : objet
             if($objet !== null) {
@@ -573,7 +573,7 @@ class Service_Search
 
             // Critères : permis
             if (isset($criterias['permis']) && $criterias['permis'] !== null){
-                $this->setCriteria($select, "dossierdocurba.NUM_DOCURBA", $criterias['permis']);
+            	$this->setCriteria($select, "dossierdocurba.NUM_DOCURBA", $criterias['permis'], false);
             }
             
             // Critères : courrier
@@ -808,9 +808,9 @@ class Service_Search
                         $select->where('groupement.ID_GROUPEMENTTYPE = 5 or groupement.ID_GROUPEMENTTYPE IS NULL');
                         
                         // Critères : numéro de doc urba
-                        if($num_doc_urba !== null) {
-                        	$select->having("NB_URBA like ?", "%$num_doc_urba%");
-                        }
+//                         if($num_doc_urba !== null) {
+//                         	$select->having("NB_URBA like ?", "%$num_doc_urba%");
+//                         }
                         
                         // Critères : objet
                         if($objet !== null) {
@@ -866,7 +866,7 @@ class Service_Search
                         
                         // Critères : permis
                         if (isset($criterias['permis']) && $criterias['permis'] !== null){
-                        	$this->setCriteria($select, "dossierdocurba.NUM_DOCURBA", $criterias['permis']);
+                        	$this->setCriteria($select, "dossierdocurba.NUM_DOCURBA", $criterias['permis'], false);
                         }
                         
                         // Critères : courrier
