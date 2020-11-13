@@ -299,12 +299,18 @@
 
     function masquerBoutonExportCalc ()
     {
-    	document.getElementById('exporter').style.display = "none"
+		var btnExporter = document.getElementById('exporter');
+    	if(typeof btnExporter !== 'undefined' && btnExporter !== null) {
+    		btnExporter.style.display = "none"
+    	}
     }
 
     function afficherBoutonExportCalc ()
     {
-    	document.getElementById('exporter').style.display = "inline"
+    	var btnExporter = document.getElementById('exporter');
+    	if(typeof btnExporter !== 'undefined' && btnExporter !== null) {
+    		btnExporter.style.display = "inline"
+    	}
     }
      
 </script>

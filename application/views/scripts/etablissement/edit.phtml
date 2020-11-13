@@ -184,7 +184,7 @@
                 <dt class='champs champ_localsommeil'>Local à sommeil ?</dt>
                 <dd class='champs champ_localsommeil'>
                     <p>
-                        <input type='radio' name='LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS' value='0' <?php if( !$this->add ) echo "checked" ?> /> Non
+                        <input type='radio' name='LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS' value='0' <?php if( $this->add || !$this->etablissement['informations']["LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS"]) echo "checked" ?> /> Non
                         <input type='radio' name='LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS' value='1' <?php if( $this->etablissement['informations']["LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS"] ) echo "checked" ?> /> Oui
                     </p>
                 </dd>
@@ -408,7 +408,7 @@
 <div id="confirm-modal" class="modal hide fade" >
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Confirmation de l'édition</h3>
+        <h3>Valeurs à confirmer</h3>
     </div>
 
     <div class="modal-body">
@@ -416,10 +416,10 @@
             <dt>Valeurs conseillées</dt>
             <dd>
                 <ul>
-                    <li id='confirm-modal-commission'>Commission renseignée : <a href="#" class='label label-info confirm-modal-input'>Aucune</a>, la commission conseillée : <a href="#" class='label confirm-modal-advisable'></a></li>
-                    <li id='confirm-modal-periodicite'>Périodicité renseignée : <a href="#" class='label label-info confirm-modal-input'>Aucune</a>, la périodicité conseillée : <a href="#" class='label confirm-modal-advisable'></a></li>
-                    <li id='confirm-modal-localsommeil'>Présence de local à sommeil renseignée : <a href="#" class='label label-info confirm-modal-input'></a>, la présence conseillée : <a href="#" class='label confirm-modal-advisable'></a></li>
-                    <li id='confirm-modal-preventionnistes' >Préventionnistes affectés : <a href="#" class='label confirm-modal-input label-info'>Aucuns</a>, les préventionnistes conseillés : <a href="#" class='label confirm-modal-advisable'></a></li>
+					<li id='confirm-modal-commission'>Commission renseignée : <a href="#" class='label confirm-modal-input'>Aucune</a>, la commission conseillée : <a href="#" class='label label-info confirm-modal-advisable'></a></li>
+                    <li id='confirm-modal-periodicite'>Périodicité renseignée : <a href="#" class='label confirm-modal-input'>Aucune</a>, la périodicité conseillée : <a href="#" class='label label-info confirm-modal-advisable'></a></li>
+                    <li id='confirm-modal-localsommeil'>Présence de local à sommeil renseignée : <a href="#" class='label confirm-modal-input'></a>, la présence conseillée : <a href="#" class='label label-info confirm-modal-advisable'></a></li>
+                    <li id='confirm-modal-preventionnistes' >Préventionnistes affectés : <a href="#" class='label confirm-modal-input'>Aucuns</a>, les préventionnistes conseillés : <a href="#" class='label confirm-modal-advisable label-info'></a></li>
                 </ul>
             </dd>
         </dl>
@@ -563,6 +563,8 @@
                             preventionnistes_ids[x] = data.response.preventionnistes[x].uid;
                         }
                         $('#confirm-modal-preventionnistes .confirm-modal-advisable').attr('ids', preventionnistes_ids.toString()).text(preventionnistes.toString());
+                    } else {
+                    	$('#confirm-modal-preventionnistes .confirm-modal-advisable').attr('ids', '').text('');
                     }
                     $('#confirm-modal').find('li').removeClass('confirm-modal-hide');
                     $('#confirm-modal').find('li').each(function(index) {

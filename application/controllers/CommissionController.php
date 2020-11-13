@@ -239,7 +239,8 @@
                         $info["NUMINSEE_COMMUNE"][0] = $rowset_adresse[0]["NUMINSEE_COMMUNE"];
 
                         // On récupère la commission
-                        $commission = $model_etablissement->getDefaultCommission($info);
+                        $service_etablissement = new Service_Etablissement();
+                        $commission = $service_etablissement->getDefaultCommission($info["NUMINSEE_COMMUNE"][0], $info['ID_CATEGORIE'], $info['ID_TYPE'], $info['LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS']);
 
                         // Si elle n'est pas nulle on l'applique
                         if ($commission != null) {

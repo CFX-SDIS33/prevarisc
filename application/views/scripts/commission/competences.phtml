@@ -34,17 +34,19 @@
 	
 	</form>
 	
+	<div class="alert alert-success" id='<?php echo $_GET["id_commission"] ?>_successDiv' style='display:none; text-align: center;'></div>
+    <div class="alert alert-danger" id='<?php echo $_GET["id_commission"] ?>_failDiv' style='display:none; text-align: center;'></div>
 	<div id="save_div" style="text-align: center" >
-			<button class='save-competences save btn btn-success' >Sauvegarder les règles</button>
-			<button class='apply-competences save btn btn-success' >Appliquer les règles</button>
+			<button id="<?php echo $_GET["id_commission"] ?>_save" class='save-competences save btn btn-success' >Sauvegarder les règles</button>
+			<button id="<?php echo $_GET["id_commission"] ?>_apply" class='apply-competences save btn btn-success' >Appliquer les règles</button>
 			
 			<span id='<?php echo $_GET["id_commission"] ?>_notification' class='ui-state-highlight ui-helper-hidden' style='padding: .5em;'>
 				Les compétences de la commission ont bien été sauvegardées.
 			</span>
 			
-			<span id='<?php echo $_GET["id_commission"] ?>_application' class='ui-state-highlight ui-helper-hidden' style='padding: .5em;'>
-				Les compétences de la commission ont bien été appliquées sur les établissements de Prevarisc.
-			</span>
+<!--			<span id='<?php echo $_GET["id_commission"] ?>_application' class='ui-state-highlight ui-helper-hidden' style='padding: .5em;'> -->
+<!-- 				Les compétences de la commission ont bien été appliquées sur les établissements de Prevarisc. -->
+<!-- 			</span> -->
 	</div>
 
 <?php endif ?>
@@ -93,10 +95,22 @@
 			url: "/commission/apply-regles",
 			data: $(this).parent().prev().serialize(),
 			type: "post",
+			beforeSend: function(){
+                $("#<?php echo $_GET["id_commission"] ?>_successDiv").html("Application des règles en cours... <img src='/images/load.gif' />").show();
+                $("#<?php echo $_GET["id_commission"] ?>_save").attr('disabled','disabled');
+                $("#<?php echo $_GET["id_commission"] ?>_apply").attr('disabled','disabled');
+            },
 			success: function() {
-				$("#<?php echo $_GET["id_commission"] ?>_application").show();
-				setTimeout( function() { $("#<?php echo $_GET["id_commission"] ?>_notification").fadeOut(); }, 2500);
-			}
+				$("#<?php echo $_GET["id_commission"] ?>_successDiv").html("Les compétences des commissions ont bien été appliquées sur les établissements de Prevarisc.");
+				$("#<?php echo $_GET["id_commission"] ?>_save").removeAttr('disabled');
+				$("#<?php echo $_GET["id_commission"] ?>_apply").removeAttr('disabled');
+			},
+            error: function(){
+                $("#<?php echo $_GET["id_commission"] ?>_failDiv").html("Erreur lors de l'application des règles.<br/>Si le problème persiste veuillez contacter votre administrateur.");
+                $("#<?php echo $_GET["id_commission"] ?>_save").removeAttr('disabled');
+                $("#<?php echo $_GET["id_commission"] ?>_apply").removeAttr('disabled');
+                return false;
+            }
 		});
 	});
 	

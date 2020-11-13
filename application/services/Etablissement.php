@@ -1348,4 +1348,31 @@ class Service_Etablissement implements Service_Interface_Etablissement
         $DBEtab = new Model_DbTable_Etablissement;
         return $DBEtab->getDossierDonnantAvis($idEtablissement);
     }
+    
+    /**
+     * Récupération de la commission par défaut en fonction des critères donnés pour un établissement
+     *
+     * @param int $numinsee
+     * @param int $categorie
+     * @param int $type
+     * @param bool $local_sommeil
+     * @param int $etudevisite
+     * @return array
+     */
+    public function getDefaultCommission($numinsee = null, $categorie = null, $type = null, $local_sommeil = null)
+    {
+    	$model_etablissement = new Model_DbTable_Etablissement;
+    	$model_commission = new Model_DbTable_Commission;
+    	
+    	$defaultCommission = 0;
+    	
+    	if ($numinsee !== null && $categorie !== null && $type !== null && $local_sommeil !== null) {
+    		$commission = $model_commission->getCommissionDossier($numinsee, $categorie, $type, $local_sommeil ? 1 : 0, 0);
+    		if($commission !== null) {
+    			$defaultCommission = $commission[0];
+    		}
+    	}
+    	
+    	return $defaultCommission;
+    }
 }
