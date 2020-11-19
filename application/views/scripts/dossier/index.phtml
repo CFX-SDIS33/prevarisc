@@ -1350,16 +1350,7 @@ echo "
 						</select>
 						<button class='changeCommission btn' ".(('new' == $action || '' == $this->commissionInfos['ID_COMMISSION']) ? "style='display:none;'" : "")."><i class='icon-remove'></i>&nbsp;Choisir une autre commission</button>
 					</div>
-					<!--
-					<div class='right value span9' ".(('new' == $action) ? "style='display:none;'" : "").">".$this->commissionInfos['LIBELLE_COMMISSION']."</div>
-					<div class='right form span9' ".(($action != 'new') ? "style='display:none;'" : "").">
-						<input id='commissionSelect' style='width: 400px; color:gray;' value='".(($action != 'new') ? (($this->commissionInfos['LIBELLE_COMMISSION'] != '') ? htmlspecialchars($this->commissionInfos['LIBELLE_COMMISSION'], ENT_QUOTES) : "Tapez le nom de la commission") : "Tapez le nom de la commission")."' ".(($this->commissionInfos['LIBELLE_COMMISSION'] != '') ? "disabled" : "")."/>
-						<div id='commissionInfos' style='display:none;' >
-							<input type='hidden' name='COMMISSION_DOSSIER' id='COMMISSION_DOSSIER' value='".$this->commissionInfos['ID_COMMISSION']."' />
-						</div>
-						<button class='changeCommission btn' ".(('new' == $action || '' == $this->commissionInfos['ID_COMMISSION']) ? "style='display:none;'" : "")."><i class='icon-remove'></i>&nbsp;Choisir une autre commission</button>
-					</div>
-					-->
+					
 				</li>
 				<li class='row-fluid' id='DATEVISITE' style='".(($action != 'new' && in_array('DATEVISITE', $this->afficherChamps) && $this->dateVisite != '') ? "" : "display:none;")."margin-bottom:20px;'>
 					<div class='left libelle span3' style='float:left;'>Date de visite</div>
@@ -1369,8 +1360,8 @@ echo "
 					<div class='right form span9' ".(($action != 'new') ? "style='display:none;'" : "").">
 						<input type='text' style='width:400px;' widht name='DATEVISITE_DOSSIER' id='DATEVISITE_INPUT' value='".(($this->dateVisite) ? $this->dateVisiteInput : "")."'  readonly='readonly'/>
 						<input type='hidden' name='ID_AFFECTATION_DOSSIER_VISITE' id='ID_AFFECTATION_DOSSIER_VISITE' value='".(($this->idDateVisiteAffect) ? $this->idDateVisiteAffect : "")."' />
-						<button id='showVisite' class='showCalendar btn' ".(('new' == $action || '' == $this->commissionInfos['ID_COMMISSION']) ? "style='display:none;'" : "")."><i class='icon-chevron-down'></i>&nbsp;Afficher le calendrier</button>
-						<button id='hideVisite' class='hideCalendar btn' ".(('new' == $action || '' == $this->commissionInfos['ID_COMMISSION']) ? "style='display:none;'" : "")."><i class='icon-chevron-up'></i>&nbsp;Cacher le calendrier</button>
+						<button id='showVisite' class='showCalendar btn' ".('' == $this->commissionInfos['ID_COMMISSION'] ? "style='display:none;'" : "")."><i class='icon-chevron-down'></i>&nbsp;Afficher le calendrier</button>
+						<button id='hideVisite' class='hideCalendar btn' ".('' == $this->commissionInfos['ID_COMMISSION'] ? "style='display:none;'" : "")."><i class='icon-chevron-up'></i>&nbsp;Cacher le calendrier</button>
 						Afficher
 						<select id='month_visite' style='width:110px;'>
 					";
@@ -1417,8 +1408,8 @@ echo "
 						<input type='text' name='DATECOMM_DOSSIER' id='DATECOMM_INPUT' value='".(($this->dateCommInput) ? $this->dateCommInput : "")."' readonly='readonly'/>
 						<input type='hidden' name='ID_AFFECTATION_DOSSIER_COMMISSION' id='ID_AFFECTATION_DOSSIER_COMMISSION' value='".(($this->idDateCommissionAffect) ? $this->idDateCommissionAffect : "")."' />
 						<input type='hidden' name='DATEVISITE_PERIODIQUE' id='DATEVISITE_PERIODIQUE' value='".(($this->dateCommInput) ? $this->dateCommInput : "")."'/>
-						<button id='showCommission' class='showCalendar btn' ".(('new' == $action || '' == $this->commissionInfos['ID_COMMISSION']) ? "style='display:none;'" : "")."><i class='icon-chevron-down'></i>&nbsp;Afficher le calendrier</button>
-						<button id='hideCommission' class='hideCalendar btn' ".(('new' == $action || '' == $this->commissionInfos['ID_COMMISSION']) ? "style='display:none;'" : "")."><i class='icon-chevron-up'></i>&nbsp;Cacher le calendrier</button>
+						<button id='showCommission' class='showCalendar btn' ".('' == $this->commissionInfos['ID_COMMISSION'] ? "style='display:none;'" : "")."><i class='icon-chevron-down'></i>&nbsp;Afficher le calendrier</button>
+						<button id='hideCommission' class='hideCalendar btn' ".('' == $this->commissionInfos['ID_COMMISSION'] ? "style='display:none;'" : "")."><i class='icon-chevron-up'></i>&nbsp;Cacher le calendrier</button>
 						Afficher
 						<select id='month_comm' style='width:110px;'>
 					";
