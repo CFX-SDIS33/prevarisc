@@ -245,7 +245,7 @@
                         // Si elle n'est pas nulle on l'applique
                         if ($commission != null) {
                             $row_ets = $model_etablissementInformation->find($info["ID_ETABLISSEMENTINFORMATIONS"])->current();
-                            $row_ets->ID_COMMISSION = $commission[0]["ID_COMMISSION"];
+                            $row_ets->ID_COMMISSION = $commission["ID_COMMISSION"];
                             $row_ets->save();
                         }
                     }
