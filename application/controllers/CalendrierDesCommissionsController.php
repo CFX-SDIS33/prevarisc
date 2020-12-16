@@ -1336,6 +1336,13 @@ class CalendrierDesCommissionsController extends Zend_Controller_Action
 			
 			$listeDocUrba = $dbDocUrba->getDossierDocUrba($ue['ID_DOSSIER']);
 			$listeDossiers[$val]['listeDocUrba'] = $listeDocUrba;
+			
+			$listeDossiers[$val]['preventionnistes'] = array();
+			$listePrev = $dbDossier->getPreventionnistesDossier($ue['ID_DOSSIER']);
+			if (count($listePrev) > 0) {
+				$listeDossiers[$val]['preventionnistes'] = $listePrev;
+			}
+			
 		}
 		$this->view->dossierComm = $listeDossiers;
     }

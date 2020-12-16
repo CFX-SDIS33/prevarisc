@@ -430,6 +430,23 @@ addChamp($odf, 'etablissementAdresse',$this->etablissementAdresse);
 addChamp($odf, 'numDocUrba',$this->listeDocUrba);
 addChamp($odf, 'categorieEtab',$this->categorieEtab);
 addChamp($odf, 'familleEtab',$this->etablissementInfos['informations']['LIBELLE_FAMILLE']);
+addChamp($odf, 'classeEtab',$this->etablissementInfos['informations']['LIBELLE_CLASSE']);
+if(isset($this->etablissementInfos['informations']["LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS"]) && $this->etablissementInfos['informations']["LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS"] != NULL) {
+	if ($this->etablissementInfos['informations']["LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS"] == 1) {
+		if (getenv('PREVARISC_LOCAL_SOMMEIL_TYPES') != false) {
+			$localsommeil_types = explode(';',getenv('PREVARISC_LOCAL_SOMMEIL_TYPES'));
+		} else $localsommeil_types = array(7,11);
+		if(in_array($this->etablissementInfos['informations']["ID_TYPE"], $localsommeil_types)) {
+			addChamp($odf, 'localSommeil', '');
+		} else {
+			addChamp($odf, 'localSommeil', 'H');
+		}
+	} else {
+		addChamp($odf, 'localSommeil', '');
+	}
+} else {
+	addChamp($odf, 'localSommeil', '');
+}
 addChamp($odf, 'numPublic',$this->numPublic);
 addChamp($odf, 'numPersonnel',$this->numPersonnel);
 addChamp($odf, 'numTotal',$this->numTotal);

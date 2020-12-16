@@ -183,7 +183,38 @@ function retrieveInfoDoss($segment, $dossierInfos) {
     
     addChamp($segment->infosDoss, 'categorieEtab', $dossierInfos['infosEtab']['informations']["LIBELLE_CATEGORIE"]);
     addChamp($segment->infosDoss, 'typeLettreP', $dossierInfos['infosEtab']['informations']["LIBELLE_TYPE_PRINCIPAL"]);
-    
+    if(isset($dossierInfos['infosEtab']['informations']["LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS"]) && $dossierInfos['infosEtab']['informations']["LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS"] != NULL) {
+    	if ($dossierInfos['infosEtab']['informations']["LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS"] == 1) {
+    		if (getenv('PREVARISC_LOCAL_SOMMEIL_TYPES') != false) {
+    			$localsommeil_types = explode(';',getenv('PREVARISC_LOCAL_SOMMEIL_TYPES'));
+    		} else $localsommeil_types = array(7,11);
+    		if(in_array($dossierInfos['infosEtab']['informations']["ID_TYPE"], $localsommeil_types)) {
+    			addChamp($segment->infosDoss, 'localSommeil', '');
+    		} else {
+    			addChamp($segment->infosDoss, 'localSommeil', 'H');
+    		}
+    	} else {
+    		addChamp($segment->infosDoss, 'localSommeil', '');
+    	}
+    } else {
+    	addChamp($segment->infosDoss, 'localSommeil', '');
+    }
+    if (isset($dossierInfos['infosEtab']['informations']["ID_GENRE"]) && $dossierInfos['infosEtab']['informations']["ID_GENRE"]  != NULL) {
+    	if($dossierInfos['infosEtab']['informations']["ID_GENRE"] == 4) {
+    		addChamp($segment->infosDoss, 'familleHabitation', $dossierInfos['infosEtab']['informations']["LIBELLE_FAMILLE"]);
+    	} else {
+    		addChamp($segment->infosDoss, 'familleHabitation', '');
+    	}
+    	if($dossierInfos['infosEtab']['informations']["ID_GENRE"] == 5) {
+   			addChamp($segment->infosDoss, 'classeIGH', $dossierInfos['infosEtab']['informations']["LIBELLE_CLASSE"]);
+   		} else {
+    		addChamp($segment->infosDoss, 'classeIGH', '');
+    	}
+    } else {
+    	addChamp($segment->infosDoss, 'familleHabitation', '');
+    	addChamp($segment->infosDoss, 'classeIGH', '');
+    }
+    	
     addChamp($segment->infosDoss, 'natureDossier', $dossierInfos["LIBELLE_DOSSIERNATURE"]);
     addChamp($segment->infosDoss, 'referenceCourrier',$dossierInfos["REFCOURRIER_DOSSIER"]);
     addChamp($segment->infosDoss, 'objetDossier', $dossierInfos["OBJET_DOSSIER"]);

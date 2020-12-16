@@ -20,6 +20,12 @@ $nomFichier = $this->commissionInfos[0]['DOCUMENT_CR'];
 if (file_exists(REAL_DATA_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."documents_commission".DIRECTORY_SEPARATOR.$nomFichier) && $nomFichier != ''){
 
 	$odf = new Odf(REAL_DATA_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."documents_commission".DIRECTORY_SEPARATOR.$nomFichier);
+	
+	$dateComm = new Zend_Date($this->dateComm, Zend_Date::DATES );
+	setVars($odf,'dateCommission',$dateComm->get(Zend_Date::DAY." ".Zend_Date::MONTH_NAME." ".Zend_Date::YEAR));
+	setVars($odf,'nomCommission', $this->commissionInfos[0]['LIBELLE_COMMISSION']);
+	
+	// Segment dossier pour toutes les infos liées aux dossiers
 	$dossInfos = $odf->setSegment('dossierInfos');
 
 	foreach($this->dossierComm as $val => $dossierInfos){
@@ -114,10 +120,44 @@ if (file_exists(REAL_DATA_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR
 					addChamp($dossInfos,'nomEtab', $dossierInfos['infosEtab']['informations']["LIBELLE_ETABLISSEMENTINFORMATIONS"]);
 					addChamp($dossInfos,'categorieEtab', $dossierInfos['infosEtab']['informations']["LIBELLE_CATEGORIE"]);
 					addChamp($dossInfos,'typeEtab', $dossierInfos['infosEtab']['informations']["LIBELLE_TYPE_PRINCIPAL"]);
+					if(isset($dossierInfos['infosEtab']['informations']["LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS"]) && $dossierInfos['infosEtab']['informations']["LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS"] != NULL) {
+						if ($dossierInfos['infosEtab']['informations']["LOCALSOMMEIL_ETABLISSEMENTINFORMATIONS"] == 1) {
+							if (getenv('PREVARISC_LOCAL_SOMMEIL_TYPES') != false) {
+								$localsommeil_types = explode(';',getenv('PREVARISC_LOCAL_SOMMEIL_TYPES'));
+							} else $localsommeil_types = array(7,11);
+							if(in_array($dossierInfos['infosEtab']['informations']["ID_TYPE"], $localsommeil_types)) {
+								addChamp($dossInfos, 'localSommeil', '');
+							} else {
+								addChamp($dossInfos, 'localSommeil', 'H');
+							}
+						} else {
+							addChamp($dossInfos, 'localSommeil', '');
+						}
+					} else {
+						addChamp($dossInfos, 'localSommeil', '');
+					}
+					if (isset($dossierInfos['infosEtab']['informations']["ID_GENRE"]) && $dossierInfos['infosEtab']['informations']["ID_GENRE"]  != NULL) {
+						if($dossierInfos['infosEtab']['informations']["ID_GENRE"] == 4) {
+							addChamp($dossInfos, 'familleHabitation', $dossierInfos['infosEtab']['informations']["LIBELLE_FAMILLE"]);
+						} else {
+							addChamp($dossInfos, 'familleHabitation', '');
+						}
+						if($dossierInfos['infosEtab']['informations']["ID_GENRE"] == 5) {
+							addChamp($dossInfos, 'classeIGH', $dossierInfos['infosEtab']['informations']["LIBELLE_CLASSE"]);
+						} else {
+							addChamp($dossInfos, 'classeIGH', '');
+						}
+					} else {
+						addChamp($dossInfos, 'familleHabitation', '');
+						addChamp($dossInfos, 'classeIGH', '');
+					}
 				}else{
 					addChamp($dossInfos,'nomEtab', '');
 					addChamp($dossInfos,'categorieEtab', '');
 					addChamp($dossInfos,'typeEtab', '');
+					addChamp($dossInfos,'localSommeil', '');
+					addChamp($dossInfos,'familleHabitation', '');
+					addChamp($dossInfos,'classeIGH', '');
 				}
 
 				switch($dossierInfos['AVIS_DOSSIER']){
@@ -151,7 +191,17 @@ if (file_exists(REAL_DATA_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR
 					$listeDocUrba .= $docurb['NUM_DOCURBA']."    ";
 				}
 				addChamp($dossInfos,'numDocUrba', $listeDocUrba);
-
+				
+				$listePreventioniste = array();
+				$listeTelPreventioniste = array();
+				if (isset($dossierInfos["preventionnistes"])) {
+					foreach($dossierInfos["preventionnistes"] as $va => $preventioniste){
+						$listePreventioniste[] = $preventioniste['GRADE_UTILISATEURINFORMATIONS']. " ".$preventioniste['NOM_UTILISATEURINFORMATIONS']. " ".$preventioniste['PRENOM_UTILISATEURINFORMATIONS'];
+						$listeTelPreventioniste[] = $preventioniste['TELFIXE_UTILISATEURINFORMATIONS'];
+					}
+				}
+				addChamp($dossInfos, 'preventionnistes', implode(', ', $listePreventioniste));
+				addChamp($dossInfos, 'listeTelPreventioniste', implode(', ', $listeTelPreventioniste));
 
 				$dossInfos->merge();
 			}
@@ -188,6 +238,18 @@ function savePj($dateCommId,$libelleDocument){
 	$linkPj->save();
 
 	return $nouvellePJ;
+}
+
+function setVars($odf,$nomOdf, $variable){
+	try{
+		if($variable == "") {
+			$variable = "";
+		}
+		$odf->setVars($nomOdf,$variable, true,'UTF8');
+		#$segment->$nomOdf(utf8_decode($variable));
+	} catch (Exception $e) {
+		
+	}
 }
 
 ?>
